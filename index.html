@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Car model</title>
+<link rel="icon" href="favicon.svg">
+<link rel="stylesheet" href="assets/css/style.css">
+<script type="importmap">
+{
+  "imports": {
+    "three": "./vendor/three.module.js",
+    "three/addons/": "./vendor/jsm/"
+  }
+}
+</script>
+</head>
+<body>
+<div id="loading">Loading model</div>
+<canvas id="view"></canvas>
+
+<div id="cutRow" hidden>
+  <label><input type="checkbox" id="cutToggle"> Cutaway</label>
+  <input type="range" id="cutSlider" min="-1" max="1" step="0.01" value="0.3" disabled
+         aria-label="Cutaway depth">
+</div>
+<!-- CC-BY models must be credited. Put the model name, author and licence here. -->
+<p id="credit">This work is based on <a href="https://sketchfab.com/3d-models/mercedes-benz-s-580-maybach-w223-6125a32ee10048ca96eee0c28b9c8b6c">&ldquo;Mercedes-Benz S 580 Maybach (W223)&rdquo;</a>
+by <a href="https://sketchfab.com/Car2022">GT Cars: Hyperspeed</a>, licensed under <a href="https://creativecommons.org/licenses/by/4.0/">CC&nbsp;BY&nbsp;4.0</a>.</p>
+<script type="module" src="assets/js/main.js"></script>
+</body>
+</html>
