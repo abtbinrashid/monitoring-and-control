@@ -25,7 +25,12 @@ const FAN        = THREE.MathUtils.degToRad(23);   /* half spread of a lamp */
 const LOW_RANGE  = 68;      /* metres a dipped beam reaches                 */
 const HIGH_RANGE = 142;     /* metres with full beam                        */
 const IR_RANGE   = 185;     /* metres the infrared sensor can see           */
-const SPEED      = 15;      /* metres per second, the car's road speed      */
+/* The scene is deliberately static: it is a diagram of what the systems do,
+   not a driving simulation. Positions below are chosen so that both systems
+   are demonstrating themselves at once. */
+const STATIC_ONCOMING = 62;    /* close enough for the masked corridor to read */
+const STATIC_DEER     = 124;   /* past the headlights, inside infrared range   */
+const STATIC_PERSON   = 150;
 
 const ROAD_LEN   = 460;
 const LANE_MINE  = 0.0;     /* centre of our lane                           */
@@ -347,7 +352,7 @@ function glowSprite() {
 }
 
 const oncoming = buildOncoming();
-oncoming.position.set(240, 0, LANE_OPP);
+oncoming.position.set(STATIC_ONCOMING, 0, LANE_OPP);
 oncoming.rotation.y = Math.PI;
 scene.add(oncoming);
 S.oncoming = oncoming;
@@ -452,8 +457,10 @@ function addHazard(url, opts) {
     });
 
     if (g.animations && g.animations.length) {
+      /* step the clip once to a natural mid-stride pose, then leave it there */
       const mx = new THREE.AnimationMixer(root);
       mx.clipAction(g.animations[0]).play();
+      mx.setTime(opts.pose || 0.45);
       mixers.push(mx);
     }
 
@@ -601,8 +608,8 @@ function computeTargets() {
       S.detected = { label: best.h.label, dist: best.d, beyond };
       if (beyond) {
         S.warnTimer += 1 / 60;
-        const phase = S.warnTimer % 2.4;
-        const flashing = phase < 1.1;
+        const phase = S.warnTimer % 1.9;
+        const flashing = phase < 1.2;
         S.warnFlash = flashing ? (Math.sin(phase * 34) * 0.5 + 0.5) : 0;
 
         const hx = best.h.obj.position.x, hz = best.h.obj.position.z;
@@ -658,21 +665,8 @@ let hudTick = 0;
 function update(dt, t) {
   if (!booted) return;
   if (S.stars) S.stars.uniforms.uT.value = t;
-  roadUniforms.uScroll.value -= SPEED * dt;
 
-  /* traffic and hazards stream toward the car */
-  if (S.oncoming) {
-    S.oncoming.position.x -= (SPEED + 13) * dt;
-    if (S.oncoming.position.x < -40) S.oncoming.position.x = 250 + Math.random() * 120;
-  }
-  S.hazards.forEach(h => {
-    h.obj.position.x -= SPEED * dt;
-    if (h.obj.position.x < -25) {
-      h.obj.position.x = 215 + Math.random() * 90;
-      h.obj.position.z = h.lane;
-    }
-  });
-
+  /* nothing moves — only the lamps respond, which is the point of the page */
   if (lamps.length) computeTargets();
 
   /* ease every LED toward its target — the system never snaps */
@@ -696,8 +690,6 @@ function update(dt, t) {
     l.halo.material.opacity = 0.25 + 0.6 * (lit / SEG);
     l.spot.intensity = 18 + 46 * (lit / SEG);
   });
-
-  mixers.forEach(m => m.update(dt));
 
   hudTick += dt;
   if (hudTick > 0.1) { hudTick = 0; paintHUD(); }
@@ -789,11 +781,11 @@ viewer.ready.then(({ size }) => {
 
   addHazard("assets/models/deer.glb", {
     kind: "deer", label: "Deer", height: 1.35, radius: 0.9,
-    x: 128, z: LANE_MINE - 0.3, facing: Math.PI * 0.5
+x: STATIC_DEER, z: LANE_MINE - 0.45, facing: Math.PI * 0.5, pose: 0.7
   });
   addHazard("assets/models/pedestrian.glb", {
     kind: "person", label: "Pedestrian", height: 1.78, radius: 0.45,
-    x: 196, z: 2.25, facing: -Math.PI / 2
+x: STATIC_PERSON, z: 2.3, facing: -Math.PI / 2, pose: 0.55
   });
 
   camera.position.set(-7.5, 2.4, 0.4);

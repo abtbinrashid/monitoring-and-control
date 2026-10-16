@@ -12,14 +12,14 @@ python3 -m http.server 8099
 
 then visit <http://localhost:8099>. On GitHub Pages it just works.
 
-## Pages
+## Night driving (not on the site yet)
 
-| Page | What it is |
-|---|---|
-| `index.html` | the car on its own, with a cutaway slider |
-| `multibeam.html` | night driving, demonstrating two lighting **control systems** |
+`multibeam.html` is finished but deliberately **not linked from `index.html`**.
+Open it directly when you want it. To put it on the site, add a link to
+`index.html`.
 
-## Night driving
+It is a static scene &mdash; a diagram of what the systems do, not a driving
+simulation. Nothing moves except the headlamp LEDs themselves.
 
 Two systems share the same headlamps. Both are control systems rather than
 monitoring ones, because each ends in an actuator instead of a display.
