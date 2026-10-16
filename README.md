@@ -45,6 +45,12 @@ Looking exactly like the original was the requirement, so the lossless build is
 shipped and the first load is around 9.6 MB. The loading bar exists because of
 this.
 
+The model download is kicked off by a small inline script in `index.html`
+rather than waiting for `main.js`. Otherwise the 9.6 MB download cannot start
+until the 1.3 MB three.js module graph has been fetched and parsed; starting it
+during HTML parse runs the two in parallel. `main.js` reuses that in-flight
+response, so the file is still only requested once.
+
 If a faster load ever matters more than being pixel-perfect, the middle row is
 the best trade:
 

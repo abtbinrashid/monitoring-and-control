@@ -226,6 +226,27 @@ const loader = new GLTFLoader()
 const modelq = new URLSearchParams(location.search).get("model");
 if (modelq) SOURCES.unshift(modelq);
 
+/* Progress for the early fetch started in index.html. Byte counts there are
+   already decompressed, so no Content-Length guessing is needed.            */
+window.__onModelProgress = (loaded, total) => {
+  targetPct = Math.min(96, (loaded / (total || EXPECTED_BYTES)) * 96);
+  loadLabel.textContent = targetPct >= 95.5 ? "Preparing model" : "Loading model";
+};
+
+/* Use the head-start download if index.html managed to begin one. */
+async function loadEarly() {
+  if (!window.__modelFetch) return false;
+  try {
+    const buf = await window.__modelFetch;
+    await new Promise((resolve, reject) =>
+      loader.parse(buf, "", gltf => { place(gltf.scene); resolve(); }, reject));
+    return true;
+  } catch (err) {
+    console.warn("early model fetch failed, falling back", err);
+    return false;
+  }
+}
+
 function tryLoad(i) {
   if (i >= SOURCES.length) { showHelp(); return; }
   loader.load(
@@ -344,7 +365,7 @@ function showHelp() {
     "</div>";
 }
 
-tryLoad(0);
+loadEarly().then(ok => { if (!ok) tryLoad(0); });
 
 /* ----------------------------------------------------------------- loop */
 function resize() {
