@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Night driving — lighting control systems</title>
+<link rel="icon" href="favicon.svg">
+<link rel="stylesheet" href="assets/css/style.css">
+<script src="assets/js/preload.js"></script>
+<script type="importmap">
+{
+  "imports": {
+    "three": "./vendor/three.module.js",
+    "three/addons/": "./vendor/jsm/"
+  }
+}
+</script>
+</head>
+<body class="night">
+
+<div id="loading">
+  <div class="load-box">
+    <p class="load-label" id="loadLabel">Loading model</p>
+    <div class="load-bar"><div class="load-fill" id="loadFill"></div></div>
+    <p class="load-pct" id="loadPct">0%</p>
+  </div>
+</div>
+
+<canvas id="view"></canvas>
+
+<nav id="pages">
+  <a href="index.html">Model</a>
+  <a href="multibeam.html" aria-current="page">Night driving</a>
+</nav>
+
+<div id="views" class="seg">
+  <button type="button" data-view="driver" aria-pressed="true">Driver</button>
+  <button type="button" data-view="side"   aria-pressed="false">Side</button>
+  <button type="button" data-view="above"  aria-pressed="false">Above</button>
+</div>
+
+<aside id="hud">
+  <h1>Night driving</h1>
+  <p class="sub">Two control systems sharing one set of headlamps.</p>
+
+  <section class="sys">
+    <h2><span class="dot cam"></span>MULTIBEAM</h2>
+    <dl>
+      <dt>Camera sensor</dt><dd id="camState" class="val">&mdash;</dd>
+      <dt>Microprocessor</dt><dd id="camAction" class="act">&mdash;</dd>
+    </dl>
+    <label class="opt"><input type="checkbox" id="optMask"> Mask oncoming vehicles</label>
+  </section>
+
+  <section class="sys">
+    <h2><span class="dot ir"></span>Night View Assist</h2>
+    <dl>
+      <dt>Infrared sensor</dt><dd id="irState" class="val">&mdash;</dd>
+      <dt>Microprocessor</dt><dd id="irAction" class="act">&mdash;</dd>
+    </dl>
+    <label class="opt"><input type="checkbox" id="optNight"> Flash a warning beam</label>
+  </section>
+
+  <section class="sys">
+    <h2><span class="dot led"></span>LED actuators</h2>
+    <div class="ledbar" id="ledBar"><span></span></div>
+    <p class="ledline">
+      <strong id="ledLit">84</strong> lit &middot;
+      <strong id="ledOff">0</strong> switched off &middot; 84 total
+    </p>
+    <dl>
+      <dt>Beam</dt><dd id="beamMode" class="val">&mdash;</dd>
+    </dl>
+    <label class="opt"><input type="checkbox" id="optHigh"> Full beam</label>
+  </section>
+
+  <p class="foot">
+    Each headlamp holds 42 LEDs that the microprocessor can switch
+    independently. The sensors read the road again every frame, so the beam
+    is corrected continuously &mdash; that returning measurement is the
+    feedback which makes this a control system rather than a monitoring one.
+  </p>
+</aside>
+
+<p id="credit">
+Models, all <a href="https://creativecommons.org/licenses/by/4.0/">CC&nbsp;BY&nbsp;4.0</a>:
+<a href="https://sketchfab.com/3d-models/mercedes-benz-s-580-maybach-w223-6125a32ee10048ca96eee0c28b9c8b6c">S 580 Maybach</a> by GT Cars: Hyperspeed &middot;
+<a href="https://sketchfab.com/3d-models/deer-walk-229ba6ba0d1e4811ab89382f74601e16">Deer walk</a> by LostBoyz2078 &middot;
+<a href="https://sketchfab.com/3d-models/nathan-animated-003-walking-3d-man-143a2b1ea5eb4385ae90a73657aca3bc">Nathan Animated 003</a> by Renderpeople &middot;
+<a href="https://sketchfab.com/3d-models/pine-tree-01-ba7c8f8e1cb549b3a3a30f1221386c8c">Pine tree 01</a> by Digital screen official &middot;
+<a href="https://sketchfab.com/3d-models/road-sign-e205fc3ff5d84b65a4fd89c68af6068e">Road Sign</a> by syedraza
+</p>
+
+<script type="module" src="assets/js/multibeam.js"></script>
+</body>
+</html>

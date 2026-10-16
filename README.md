@@ -1,4 +1,4 @@
-# Car model viewer
+# Monitoring and control systems
 
 A three.js studio viewer: loads a car model, scales it to real size, stands it on
 the ground, lights it and lets you orbit and zoom around it.
@@ -11,6 +11,35 @@ python3 -m http.server 8099
 ```
 
 then visit <http://localhost:8099>. On GitHub Pages it just works.
+
+## Pages
+
+| Page | What it is |
+|---|---|
+| `index.html` | the car on its own, with a cutaway slider |
+| `multibeam.html` | night driving, demonstrating two lighting **control systems** |
+
+## Night driving
+
+Two systems share the same headlamps. Both are control systems rather than
+monitoring ones, because each ends in an actuator instead of a display.
+
+**MULTIBEAM.** A camera sensor finds oncoming vehicles. The microprocessor works
+out which of the 42 LED segments in each headlamp are pointing at them and
+switches just those off, leaving full beam everywhere else. The dark corridor it
+carves travels with the other car.
+
+**Night View Assist.** An infrared sensor sees heat out to 185 m, well past the
+142 m the headlights reach. When it finds a person or an animal out there, the
+segments aimed at it are flashed as a warning and the hazard is bracketed.
+
+Untick either box to see what the system is really doing: with masking off the
+oncoming driver is dazzled, and with Night View Assist off the deer stays
+invisible until it is nearly too late.
+
+The sensors read the road again every frame, so the beam is corrected
+continuously. That returning measurement is the **feedback** that makes these
+control systems rather than monitoring ones.
 
 ## The model
 
