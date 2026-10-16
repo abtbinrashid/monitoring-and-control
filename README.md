@@ -18,26 +18,42 @@ then visit <http://localhost:8099>. On GitHub Pages it just works.
 *GT Cars: Hyperspeed*, CC Attribution 4.0, 293k triangles, full interior.
 <https://sketchfab.com/3d-models/mercedes-benz-s-580-maybach-w223-6125a32ee10048ca96eee0c28b9c8b6c>
 
-The Sketchfab download is 17.5 MB (`scene.gltf` + a 15 MB `scene.bin` + PNG
-textures). That is recompressed for the web with
-[glTF-Transform](https://gltf-transform.dev):
+The Sketchfab download is 16 files (`scene.gltf` + a 15 MB `scene.bin` + PNG
+textures). It is repackaged into a single `.glb`, which is a **lossless**
+container change &mdash; no geometry and no texture data is altered:
 
 ```bash
-npx @gltf-transform/cli optimize scene.gltf car.glb \
-  --compress meshopt --texture-compress webp --simplify false
+npx @gltf-transform/cli copy scene.gltf car.glb
 ```
 
-**17.5 MB → 2.7 MB**, about 1.8 MB gzipped over the wire. `--simplify false`
-matters: simplification is on by default and would discard triangles. Nothing
-was simplified, so the mesh is identical to the original.
+Verified by rendering both and comparing: **100.00% of pixels identical, maximum
+channel difference 0.**
 
-Meshopt was chosen over Draco deliberately. Draco produced a slightly smaller
-file (1.68 MB gzipped vs 1.79 MB) but decodes much more slowly, which is the
-wrong trade on a low-powered laptop for a 6% size saving.
+### Why it is not compressed further
 
-To swap in a different car, drop it at any path listed in `SOURCES` at the top
-of `assets/js/main.js`, and update `EXPECTED_BYTES` so the loading bar stays
-accurate.
+Lossy compression was tried and rejected. Measured against a render of the
+original, at the same camera:
+
+| Build | Over the wire | Pixels identical |
+|---|---|---|
+| Lossless single `.glb` (shipped) | 9.6 MB | **100.00%** |
+| meshopt geometry, PNG textures kept | 4.4 MB | 94.68% |
+| meshopt + lossy WebP textures | 1.8 MB | 90.06% |
+
+The small builds are visibly different &mdash; the lighting and interior change.
+Looking exactly like the original was the requirement, so the lossless build is
+shipped and the first load is around 9.6 MB. The loading bar exists because of
+this.
+
+If a faster load ever matters more than being pixel-perfect, the middle row is
+the best trade:
+
+```bash
+npx @gltf-transform/cli meshopt scene.gltf car.glb
+```
+
+Then set `EXPECTED_BYTES` in `assets/js/main.js` to the new file size so the
+loading bar stays accurate.
 
 ## Seeing inside
 

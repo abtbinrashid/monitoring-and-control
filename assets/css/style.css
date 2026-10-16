@@ -24,7 +24,6 @@ body{
 .load-fill{
   height:100%; width:0%; border-radius:3px;
   background:linear-gradient(90deg,#6c8bab,#46607a);
-  transition:width .25s ease;
 }
 .load-pct{
   margin:.7rem 0 0; font-size:.74rem; letter-spacing:.06em;

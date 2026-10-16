@@ -34,14 +34,47 @@ const loadLabel = document.getElementById("loadLabel");
    gzipped: Content-Length is then the COMPRESSED size while xhr.loaded counts
    DECOMPRESSED bytes, so loaded/total runs way past 100%. Update this if the
    model is replaced - it is only used to show progress, never to load.      */
-const EXPECTED_BYTES = 2671956;
+const EXPECTED_BYTES = 17416816;
 
-function setProgress(pct, label) {
-  pct = Math.max(0, Math.min(100, pct));
-  loadFill.style.width = pct.toFixed(1) + "%";
-  loadPct.textContent = Math.round(pct) + "%";
-  if (label) loadLabel.textContent = label;
+/* The bar is animated frame by frame rather than being set straight from the
+   download figure. Two reasons: a cached load would otherwise snap from 0 to
+   100 with nothing to see, and the number and the bar can never disagree
+   because both are painted from the same value.                             */
+let targetPct = 0;      /* where the download actually is  */
+let shownPct  = 0;      /* where the bar is drawn          */
+let modelReady = false;
+let finished   = false;
+
+function finishLoading() {
+  if (finished) return;
+  finished = true;
+  shownPct = 100;
+  paintProgress();
+  loadLabel.textContent = "Ready";
+  status.classList.add("done");
+  setTimeout(() => status.remove(), 480);
 }
+
+function paintProgress() {
+  loadFill.style.width = shownPct.toFixed(2) + "%";
+  loadPct.textContent  = Math.floor(shownPct) + "%";
+}
+
+function animateProgress() {
+  const gap = targetPct - shownPct;
+  if (gap > 0) {
+    shownPct += Math.max(gap * 0.055, 0.14);   /* ease in, but always climb */
+  } else if (!modelReady && shownPct < 99) {
+    shownPct += 0.012;                          /* creep so it never stalls  */
+  }
+  if (shownPct > 100) shownPct = 100;
+  paintProgress();
+
+  if (modelReady && shownPct >= 99.995) { finishLoading(); return; }
+  if (finished) return;
+  requestAnimationFrame(animateProgress);
+}
+requestAnimationFrame(animateProgress);
 
 /* ------------------------------------------------------------- renderer */
 const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
@@ -189,6 +222,10 @@ const loader = new GLTFLoader()
   .setDRACOLoader(draco)
   .setMeshoptDecoder(MeshoptDecoder);
 
+/* ?model=<path> loads a specific file, used when comparing compression */
+const modelq = new URLSearchParams(location.search).get("model");
+if (modelq) SOURCES.unshift(modelq);
+
 function tryLoad(i) {
   if (i >= SOURCES.length) { showHelp(); return; }
   loader.load(
@@ -198,8 +235,9 @@ function tryLoad(i) {
       /* trust Content-Length only when it is consistent with what has been
          read; otherwise the response is gzipped and it is the compressed size */
       const total = (xhr.total && xhr.loaded <= xhr.total) ? xhr.total : EXPECTED_BYTES;
-      const pct = (xhr.loaded / total) * 100;
-      setProgress(pct, pct >= 99.5 ? "Preparing model" : "Loading model");
+      /* downloading covers 0-96%; the rest is decoding and uploading to the GPU */
+      targetPct = Math.min(96, (xhr.loaded / total) * 96);
+      loadLabel.textContent = targetPct >= 95.5 ? "Preparing model" : "Loading model";
     },
     () => tryLoad(i + 1)
   );
@@ -271,9 +309,11 @@ function place(model) {
   Object.assign(key.shadow.camera,
     { left: -r, right: r, top: r, bottom: -r, near: 0.5, far: r * 6 });
   key.shadow.camera.updateProjectionMatrix();
-  setProgress(100, "Ready");
-  status.classList.add("done");
-  setTimeout(() => status.remove(), 500);
+  modelReady = true;
+  targetPct = 100;
+  /* requestAnimationFrame is throttled in background tabs, so never let the
+     overlay outlive the model by more than a moment */
+  setTimeout(finishLoading, 1600);
   window.__car = model;
   document.getElementById("cutRow").hidden = false;
   /* default the cut to just inboard of the near door */
