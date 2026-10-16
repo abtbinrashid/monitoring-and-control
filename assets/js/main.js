@@ -16,9 +16,7 @@ import { MeshoptDecoder } from "three/addons/libs/meshopt_decoder.module.js";
 /* where to look for a model, in order of preference */
 const SOURCES = [
   "assets/models/car.glb",
-  "assets/models/mercedes-benz_s_580_maybach_w223/scene.gltf",
-  "assets/models/car.gltf",
-  "assets/models/car/scene.gltf"
+  "assets/models/car/scene.gltf"     /* an unpacked Sketchfab folder */
 ];
 
 const TARGET_LENGTH = 5.3;          /* metres — model is scaled to this      */
@@ -243,8 +241,21 @@ async function loadEarly() {
     return true;
   } catch (err) {
     console.warn("early model fetch failed, falling back", err);
+    lastError = err;
     return false;
   }
+}
+
+let lastError = null;
+let attempt = 0;
+
+/* A 9.6 MB download can be cut off on a weak connection, so one retry is
+   worth it before telling the user something is wrong. */
+function startLoading() {
+  loadEarly().then(ok => {
+    if (ok) return;
+    tryLoad(0);
+  });
 }
 
 function tryLoad(i) {
@@ -260,7 +271,7 @@ function tryLoad(i) {
       targetPct = Math.min(96, (xhr.loaded / total) * 96);
       loadLabel.textContent = targetPct >= 95.5 ? "Preparing model" : "Loading model";
     },
-    () => tryLoad(i + 1)
+    err => { lastError = err; tryLoad(i + 1); }
   );
 }
 
@@ -355,17 +366,33 @@ function place(model) {
 }
 
 function showHelp() {
+  if (attempt < 1 && lastError) {
+    attempt++;
+    loadLabel.textContent = "Connection dropped, retrying";
+    targetPct = 0; shownPct = 0; lastError = null;
+    tryLoad(0);
+    return;
+  }
   status.classList.remove("done");
+  const dropped = lastError && !/404|not found/i.test(String(lastError && lastError.message));
   status.innerHTML =
-    '<div style="max-width:30rem;text-align:left;text-transform:none;letter-spacing:0;line-height:1.6">' +
-    '<strong style="font-size:1.05rem">No model found</strong><br><br>' +
-    'Save a car model as <code>assets/models/car.glb</code>, or a Sketchfab ' +
-    'glTF folder as <code>assets/models/car/scene.gltf</code>, then reload. ' +
-    'See <code>README.md</code> for where to get one.' +
+    '<div class="load-help">' +
+    (dropped
+      ? "<strong>Could not download the model</strong>" +
+        "<p>The connection dropped partway through the 9.6&nbsp;MB download. " +
+        "This usually means a slow or unstable network rather than a problem " +
+        "with the page.</p>" +
+        '<button id="retryBtn" type="button">Try again</button>'
+      : "<strong>No model found</strong>" +
+        "<p>Save a car model as <code>assets/models/car.glb</code>, or an " +
+        "unpacked Sketchfab glTF folder as <code>assets/models/car/scene.gltf</code>, " +
+        "then reload. See <code>README.md</code> for where to get one.</p>") +
     "</div>";
+  const btn = document.getElementById("retryBtn");
+  if (btn) btn.onclick = () => location.reload();
 }
 
-loadEarly().then(ok => { if (!ok) tryLoad(0); });
+startLoading();
 
 /* ----------------------------------------------------------------- loop */
 function resize() {
