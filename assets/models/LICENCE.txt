@@ -1,0 +1,13 @@
+Model: "Mercedes-Benz S 580 Maybach (W223)"
+Source: https://sketchfab.com/3d-models/mercedes-benz-s-580-maybach-w223-6125a32ee10048ca96eee0c28b9c8b6c
+Author: GT Cars: Hyperspeed (https://sketchfab.com/Car2022)
+Licence: CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+
+This work is based on "Mercedes-Benz S 580 Maybach (W223)"
+(https://sketchfab.com/3d-models/mercedes-benz-s-580-maybach-w223-6125a32ee10048ca96eee0c28b9c8b6c)
+by GT Cars: Hyperspeed (https://sketchfab.com/Car2022)
+licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+
+car.glb in this folder is the same model, recompressed for the web with
+glTF-Transform (meshopt geometry compression, WebP textures). No geometry
+was simplified; the mesh is unchanged at 293k triangles.

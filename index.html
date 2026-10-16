@@ -16,7 +16,13 @@
 </script>
 </head>
 <body>
-<div id="loading">Loading model</div>
+<div id="loading">
+  <div class="load-box">
+    <p class="load-label" id="loadLabel">Loading model</p>
+    <div class="load-bar"><div class="load-fill" id="loadFill"></div></div>
+    <p class="load-pct" id="loadPct">0%</p>
+  </div>
+</div>
 <canvas id="view"></canvas>
 
 <div id="cutRow" hidden>

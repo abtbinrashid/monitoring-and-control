@@ -15,8 +15,8 @@ import { MeshoptDecoder } from "three/addons/libs/meshopt_decoder.module.js";
 
 /* where to look for a model, in order of preference */
 const SOURCES = [
-  "assets/models/mercedes-benz_s_580_maybach_w223/scene.gltf",
   "assets/models/car.glb",
+  "assets/models/mercedes-benz_s_580_maybach_w223/scene.gltf",
   "assets/models/car.gltf",
   "assets/models/car/scene.gltf"
 ];
@@ -24,8 +24,24 @@ const SOURCES = [
 const TARGET_LENGTH = 5.3;          /* metres — model is scaled to this      */
 const MODEL_YAW     = 0;            /* turn the car: 0, 90, 180 or 270        */
 
-const canvas = document.getElementById("view");
-const status = document.getElementById("loading");
+const canvas    = document.getElementById("view");
+const status    = document.getElementById("loading");
+const loadFill  = document.getElementById("loadFill");
+const loadPct   = document.getElementById("loadPct");
+const loadLabel = document.getElementById("loadLabel");
+
+/* Uncompressed size of car.glb. Needed because the server sends the file
+   gzipped: Content-Length is then the COMPRESSED size while xhr.loaded counts
+   DECOMPRESSED bytes, so loaded/total runs way past 100%. Update this if the
+   model is replaced - it is only used to show progress, never to load.      */
+const EXPECTED_BYTES = 2671956;
+
+function setProgress(pct, label) {
+  pct = Math.max(0, Math.min(100, pct));
+  loadFill.style.width = pct.toFixed(1) + "%";
+  loadPct.textContent = Math.round(pct) + "%";
+  if (label) loadLabel.textContent = label;
+}
 
 /* ------------------------------------------------------------- renderer */
 const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
@@ -179,8 +195,11 @@ function tryLoad(i) {
     SOURCES[i],
     gltf => place(gltf.scene),
     xhr => {
-      if (xhr.total) status.textContent =
-        "Loading model " + Math.round((xhr.loaded / xhr.total) * 100) + "%";
+      /* trust Content-Length only when it is consistent with what has been
+         read; otherwise the response is gzipped and it is the compressed size */
+      const total = (xhr.total && xhr.loaded <= xhr.total) ? xhr.total : EXPECTED_BYTES;
+      const pct = (xhr.loaded / total) * 100;
+      setProgress(pct, pct >= 99.5 ? "Preparing model" : "Loading model");
     },
     () => tryLoad(i + 1)
   );
@@ -252,7 +271,9 @@ function place(model) {
   Object.assign(key.shadow.camera,
     { left: -r, right: r, top: r, bottom: -r, near: 0.5, far: r * 6 });
   key.shadow.camera.updateProjectionMatrix();
-  status.remove();
+  setProgress(100, "Ready");
+  status.classList.add("done");
+  setTimeout(() => status.remove(), 500);
   window.__car = model;
   document.getElementById("cutRow").hidden = false;
   /* default the cut to just inboard of the near door */
@@ -273,6 +294,7 @@ function place(model) {
 }
 
 function showHelp() {
+  status.classList.remove("done");
   status.innerHTML =
     '<div style="max-width:30rem;text-align:left;text-transform:none;letter-spacing:0;line-height:1.6">' +
     '<strong style="font-size:1.05rem">No model found</strong><br><br>' +

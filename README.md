@@ -14,21 +14,30 @@ then visit <http://localhost:8099>. On GitHub Pages it just works.
 
 ## The model
 
-Installed at `assets/models/mercedes-benz_s_580_maybach_w223/`:
-
-**Mercedes-Benz S 580 Maybach (W223)** by *GT Cars: Hyperspeed*
-CC Attribution 4.0 &middot; 293k triangles &middot; full interior
+`assets/models/car.glb` &mdash; **Mercedes-Benz S 580 Maybach (W223)** by
+*GT Cars: Hyperspeed*, CC Attribution 4.0, 293k triangles, full interior.
 <https://sketchfab.com/3d-models/mercedes-benz-s-580-maybach-w223-6125a32ee10048ca96eee0c28b9c8b6c>
 
-To swap in a different car later, drop it at any of the paths listed in
-`SOURCES` at the top of `assets/js/main.js` &mdash; a `.glb`, or an unzipped
-Sketchfab folder containing `scene.gltf`, `scene.bin` and `textures/`.
+The Sketchfab download is 17.5 MB (`scene.gltf` + a 15 MB `scene.bin` + PNG
+textures). That is recompressed for the web with
+[glTF-Transform](https://gltf-transform.dev):
 
-The CC Attribution licence requires you to **credit the author**. This is already
-filled in on the `#credit` line in `index.html` &mdash; leave it there:
+```bash
+npx @gltf-transform/cli optimize scene.gltf car.glb \
+  --compress meshopt --texture-compress webp --simplify false
+```
 
-> This work is based on "Mercedes-Benz S 580 Maybach (W223)" by GT Cars: Hyperspeed,
-> licensed under CC-BY-4.0.
+**17.5 MB → 2.7 MB**, about 1.8 MB gzipped over the wire. `--simplify false`
+matters: simplification is on by default and would discard triangles. Nothing
+was simplified, so the mesh is identical to the original.
+
+Meshopt was chosen over Draco deliberately. Draco produced a slightly smaller
+file (1.68 MB gzipped vs 1.79 MB) but decodes much more slowly, which is the
+wrong trade on a low-powered laptop for a 6% size saving.
+
+To swap in a different car, drop it at any path listed in `SOURCES` at the top
+of `assets/js/main.js`, and update `EXPECTED_BYTES` so the loading bar stays
+accurate.
 
 ## Seeing inside
 

@@ -5,10 +5,30 @@ body{
   color:#2a3038;
 }
 #view{ display:block; width:100vw; height:100vh; touch-action:none; }
-#loading{ padding:2rem;
-  position:fixed; inset:0; display:grid; place-items:center;
-  background:#e4e7ec; color:#6b7480; font-size:.9rem; letter-spacing:.08em;
-  text-transform:uppercase;
+#loading{
+  position:fixed; inset:0; z-index:50; display:grid; place-items:center;
+  padding:2rem; background:#e4e7ec; color:#6b7480;
+  transition:opacity .45s ease;
+}
+#loading.done{ opacity:0; pointer-events:none; }
+
+.load-box{ width:min(21rem, 80vw); text-align:center; }
+.load-label{
+  margin:0 0 .85rem; font-size:.78rem; letter-spacing:.1em;
+  text-transform:uppercase; color:#79828e;
+}
+.load-bar{
+  height:3px; border-radius:3px; overflow:hidden;
+  background:#cfd4db;
+}
+.load-fill{
+  height:100%; width:0%; border-radius:3px;
+  background:linear-gradient(90deg,#6c8bab,#46607a);
+  transition:width .25s ease;
+}
+.load-pct{
+  margin:.7rem 0 0; font-size:.74rem; letter-spacing:.06em;
+  font-variant-numeric:tabular-nums; color:#8b949f;
 }
 
 #credit{
