@@ -3,11 +3,13 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Car model</title>
+<title>Monitor or control? — S 580 sensors</title>
 <link rel="icon" href="favicon.svg">
-<link rel="stylesheet" href="assets/css/style.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="assets/css/sensors.css">
+<link rel="stylesheet" href="assets/css/concepts.css">
 <script src="assets/js/preload.js"></script>
-
 <script type="importmap">
 {
   "imports": {
@@ -25,21 +27,78 @@
     <p class="load-pct" id="loadPct">0%</p>
   </div>
 </div>
+
 <canvas id="view"></canvas>
+<div id="spots" hidden></div>
 
-<nav id="pages">
-  <a href="index.html" aria-current="page">Model</a>
-  <a href="sensors.html">Sensors &amp; systems</a>
-</nav>
+<div id="topleft">
+  <a id="backlink" href="model.html">&larr; JUST THE MODEL</a>
+  <nav id="topics" class="win" aria-label="Key ideas">
+    <div class="group"><b>(TOPICS)</b><i></i></div>
+    <button type="button" class="btn" data-topic="control"  aria-expanded="false"><span class="k">01</span>Control systems</button>
+    <button type="button" class="btn" data-topic="monitor"  aria-expanded="false"><span class="k">02</span>Monitor systems</button>
+    <button type="button" class="btn" data-topic="feedback" aria-expanded="false"><span class="k">03</span>The importance of feedback</button>
+  </nav>
 
-<div id="cutRow" hidden>
-  <label><input type="checkbox" id="cutToggle"> Cutaway</label>
-  <input type="range" id="cutSlider" min="-1" max="1" step="0.01" value="0.3" disabled
-         aria-label="Cutaway depth">
+  <section id="progress" class="win">
+    <div class="group"><b>(SENSORS.CTL)</b><i></i></div>
+    <h1>Monitor or control?</h1>
+    <p class="lead">Click a numbered sensor on the car, read how it works, then decide which kind of system it is.</p>
+    <div class="prog-head"><span id="doneText">0/8 completed</span><span id="scoreText">0 correct</span></div>
+    <div class="segs" id="segs"></div>
+  </section>
 </div>
-<!-- CC-BY models must be credited. Put the model name, author and licence here. -->
-<p id="credit">This work is based on <a href="https://sketchfab.com/3d-models/mercedes-benz-s-580-maybach-w223-6125a32ee10048ca96eee0c28b9c8b6c">&ldquo;Mercedes-Benz S 580 Maybach (W223)&rdquo;</a>
-by <a href="https://sketchfab.com/Car2022">GT Cars: Hyperspeed</a>, licensed under <a href="https://creativecommons.org/licenses/by/4.0/">CC&nbsp;BY&nbsp;4.0</a>.</p>
-<script type="module" src="assets/js/main.js"></script>
+
+<aside id="win" class="win" hidden role="dialog" aria-labelledby="winName">
+  <header class="titlebar">
+    <span id="winFile">SENSOR_01.SYS</span>
+    <button type="button" class="tb-btn" id="winClose" aria-label="Close">&times;</button>
+  </header>
+  <div class="win-body">
+    <p class="kicker" id="winKicker">Sensor 1 of 8</p>
+    <h2 id="winName"></h2>
+    <div class="field-head"><b>DESCRIPTION.TXT</b><span>(Read-only)</span></div>
+    <div class="field" id="winText"></div>
+  </div>
+  <footer class="win-foot">
+    <p class="q" id="winQ">Is this a monitoring system or a control system?</p>
+    <div class="btns">
+      <button type="button" class="btn" data-pick="Monitor">Monitor</button>
+      <button type="button" class="btn" data-pick="Control">Control</button>
+    </div>
+  </footer>
+</aside>
+
+<div id="infoBack" hidden>
+  <article class="win" id="infoWin" role="dialog" aria-modal="true" aria-labelledby="infoFile">
+    <header class="titlebar">
+      <span id="infoFile">CONTROL.DOC</span>
+      <button type="button" class="tb-btn" id="infoClose" aria-label="Close">&times;</button>
+    </header>
+    <div id="infoBody"></div>
+  </article>
+</div>
+
+<div id="doneBack" hidden>
+  <div class="win" id="doneWin" role="dialog" aria-labelledby="doneTitle">
+    <header class="titlebar"><span>RESULTS.TXT</span></header>
+    <div class="win-body">
+      <h2 id="doneTitle">8/8 completed</h2>
+      <p class="lead" id="doneScore"></p>
+      <div class="field results" id="doneList"></div>
+    </div>
+    <footer class="win-foot">
+      <div class="btns one"><button type="button" class="btn default" id="restart">Start again</button></div>
+    </footer>
+  </div>
+</div>
+
+<footer id="statusbar">
+  <span id="statusMsg">Loading&hellip;</span>
+  <!-- CC-BY models must be credited. -->
+  <span class="credit">Model: <a href="https://sketchfab.com/3d-models/mercedes-benz-s-580-maybach-w223-6125a32ee10048ca96eee0c28b9c8b6c">&ldquo;Mercedes-Benz S 580 Maybach (W223)&rdquo;</a> by <a href="https://sketchfab.com/Car2022">GT Cars: Hyperspeed</a>, <a href="https://creativecommons.org/licenses/by/4.0/">CC&nbsp;BY&nbsp;4.0</a></span>
+</footer>
+
+<script type="module" src="assets/js/sensors.js"></script>
 </body>
 </html>
