@@ -11,6 +11,8 @@
 }
 #progress{ position:static; width:auto; }
 
+#backlink{ display:inline-flex; align-items:center; gap:6px; margin:0 0 2px; font:600 13px/1 var(--mono); color:var(--muted); text-decoration:none; }
+#backlink:hover{ color:var(--signal); }
 #topics{ padding:12px; display:flex; flex-direction:column; gap:8px; }
 #topics .btn{ height:42px; font-size:15px; justify-content:flex-start; padding:0 14px; }
 #topics .btn .k{
