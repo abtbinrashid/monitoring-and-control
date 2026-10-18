@@ -8,6 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
 <link rel="stylesheet" href="assets/css/sensors.css">
+<link rel="stylesheet" href="assets/css/concepts.css">
 <script src="assets/js/preload.js"></script>
 <script type="importmap">
 {
@@ -30,13 +31,22 @@
 <canvas id="view"></canvas>
 <div id="spots" hidden></div>
 
-<section id="progress" class="win">
-  <div class="group"><b>(SENSORS.CTL)</b><i></i></div>
-  <h1>Monitor or control?</h1>
-  <p class="lead">Click a numbered sensor on the car, read how it works, then decide which kind of system it is.</p>
-  <div class="prog-head"><span id="doneText">0/8 completed</span><span id="scoreText">0 correct</span></div>
-  <div class="segs" id="segs"></div>
-</section>
+<div id="topleft">
+  <nav id="topics" class="win" aria-label="Key ideas">
+    <div class="group"><b>(TOPICS)</b><i></i></div>
+    <button type="button" class="btn" data-topic="control"  aria-expanded="false"><span class="k">01</span>Control systems</button>
+    <button type="button" class="btn" data-topic="monitor"  aria-expanded="false"><span class="k">02</span>Monitor systems</button>
+    <button type="button" class="btn" data-topic="feedback" aria-expanded="false"><span class="k">03</span>The importance of feedback</button>
+  </nav>
+
+  <section id="progress" class="win">
+    <div class="group"><b>(SENSORS.CTL)</b><i></i></div>
+    <h1>Monitor or control?</h1>
+    <p class="lead">Click a numbered sensor on the car, read how it works, then decide which kind of system it is.</p>
+    <div class="prog-head"><span id="doneText">0/8 completed</span><span id="scoreText">0 correct</span></div>
+    <div class="segs" id="segs"></div>
+  </section>
+</div>
 
 <aside id="win" class="win" hidden role="dialog" aria-labelledby="winName">
   <header class="titlebar">
@@ -57,6 +67,16 @@
     </div>
   </footer>
 </aside>
+
+<div id="infoBack" hidden>
+  <article class="win" id="infoWin" role="dialog" aria-modal="true" aria-labelledby="infoFile">
+    <header class="titlebar">
+      <span id="infoFile">CONTROL.DOC</span>
+      <button type="button" class="tb-btn" id="infoClose" aria-label="Close">&times;</button>
+    </header>
+    <div id="infoBody"></div>
+  </article>
+</div>
 
 <div id="doneBack" hidden>
   <div class="win" id="doneWin" role="dialog" aria-labelledby="doneTitle">

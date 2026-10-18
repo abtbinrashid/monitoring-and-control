@@ -1,0 +1,112 @@
+/* ==========================================================================
+   concepts.css — the three explainer panels and their diagrams
+   Uses the variables and panel shell defined in sensors.css.
+   ========================================================================== */
+
+/* ---------- top-left column: topic buttons sit above the progress panel ---------- */
+#topleft{
+  position:fixed; top:16px; left:16px; z-index:30;
+  width:min(22rem, calc(100vw - 32px));
+  display:flex; flex-direction:column; gap:12px;
+}
+#progress{ position:static; width:auto; }
+
+#topics{ padding:12px; display:flex; flex-direction:column; gap:8px; }
+#topics .btn{ height:42px; font-size:15px; justify-content:flex-start; padding:0 14px; }
+#topics .btn .k{
+  font:600 12px/1 var(--mono); color:var(--muted);
+  background:var(--face-hi); border-radius:2px; padding:4px 5px;
+}
+#topics .btn[aria-expanded="true"]{ background:#c4c6cb; box-shadow:var(--pressed); }
+
+/* ---------- the blurred backdrop ---------- */
+#infoBack{
+  position:fixed; inset:0; z-index:70;
+  display:grid; place-items:center; padding:24px;
+  background:rgba(228,231,236,.5);
+  backdrop-filter:blur(16px) saturate(.85);
+  -webkit-backdrop-filter:blur(16px) saturate(.85);
+}
+#infoBack[hidden]{ display:none; }
+
+#infoWin{
+  width:min(58rem, 100%); max-height:min(90vh, 54rem);
+  display:flex; flex-direction:column;
+}
+#infoBody{
+  flex:1; min-height:0; overflow-y:auto;
+  padding:18px 20px 22px;
+}
+
+/* ---------- prose ---------- */
+#infoBody h2{ margin:0 0 4px; font:600 24px/1.2 var(--sans); letter-spacing:-.01em; }
+#infoBody h3{ margin:22px 0 8px; font:600 14px/1.2 var(--mono); letter-spacing:.02em; }
+#infoBody p{ margin:0 0 12px; font:15.5px/1.6 var(--sans); color:#2b2f36; text-wrap:pretty; }
+#infoBody ul{ margin:0 0 12px; padding-left:20px; }
+#infoBody li{ margin:0 0 7px; font:15.5px/1.6 var(--sans); color:#2b2f36; }
+#infoBody .kicker{
+  margin:0 0 10px; font:600 12px/1 var(--mono); letter-spacing:.08em;
+  text-transform:uppercase; color:var(--muted);
+}
+
+/* the definition, quoted exactly */
+.defn{
+  margin:0 0 6px; padding:14px 16px;
+  background:#fff; border:1px solid var(--edge); border-radius:3px;
+  box-shadow:var(--sunken);
+  font:500 16.5px/1.55 var(--sans); color:var(--ink);
+}
+.defn b{ font:600 13px/1 var(--mono); display:block; margin:0 0 8px; color:var(--muted); letter-spacing:.04em; }
+
+.note{
+  margin:12px 0 0; padding:10px 12px;
+  border-left:3px solid var(--signal); background:var(--face-hi);
+  font:14.5px/1.55 var(--sans); color:#2b2f36;
+}
+.note.warn{ border-left-color:var(--bad); }
+
+/* ---------- diagrams ---------- */
+.diagram{ margin:10px 0 0; }
+.diagram svg{ display:block; width:100%; height:auto; }
+
+.d-box{ fill:var(--face-hi); stroke:var(--edge); stroke-width:1; }
+.d-box.proc{ fill:#fff; }
+.d-box.act{ fill:#e2e9ff; }
+.d-box.out{ fill:#e6f0e9; }
+.d-title{ font:600 12.5px/1 var(--mono); fill:var(--ink); }
+.d-sub{ font:11.5px/1 var(--sans); fill:var(--muted); }
+.d-link{ stroke:var(--edge); stroke-width:1.6; fill:none; }
+.d-flow{
+  stroke:var(--signal); stroke-width:2; fill:none;
+  stroke-dasharray:6 7; animation:dflow 1.1s linear infinite;
+}
+@keyframes dflow{ to{ stroke-dashoffset:-26; } }
+.d-fb{ stroke:var(--signal); stroke-width:2; fill:none; }
+.d-fb-label{ font:600 11.5px/1 var(--mono); fill:var(--signal); }
+.d-none{ stroke:var(--bad); stroke-width:2; fill:none; stroke-dasharray:5 6; }
+.d-none-label{ font:600 11.5px/1 var(--mono); fill:var(--bad); }
+
+/* ---------- the interactive feedback demo ---------- */
+.sim{ margin:12px 0 0; padding:14px; background:var(--face-hi); border:1px solid var(--shadow); border-radius:4px; }
+.sim-row{ display:flex; align-items:center; gap:12px; margin:0 0 10px; }
+.sim-row:last-child{ margin-bottom:0; }
+.sim-label{ flex:0 0 11rem; font:600 12.5px/1.3 var(--mono); }
+.sim-meter{ flex:1; display:block; height:22px; padding:3px; background:#fff; border:1px solid var(--edge); border-radius:3px; box-shadow:var(--sunken); }
+.sim-fill{ display:block; height:100%; border-radius:1px; background:var(--signal); transition:width .08s linear; }
+.sim-fill.brake{ background:#8a5a1e; }
+.sim-val{ flex:0 0 4.5rem; text-align:right; font:600 13px/1 var(--mono); font-variant-numeric:tabular-nums; }
+.sim-state{
+  margin:12px 0 0; padding:10px 12px; border-radius:3px;
+  font:600 14px/1.3 var(--mono); text-align:center;
+  border:1px solid var(--edge);
+}
+.sim-state.ok{ background:#e6f0e9; color:var(--ok); }
+.sim-state.bad{ background:#f6e4e3; color:var(--bad); }
+.sim-controls{ display:flex; gap:10px; margin:12px 0 0; flex-wrap:wrap; }
+.sim-controls .btn{ height:42px; font-size:15px; flex:1; min-width:12rem; }
+
+@media (max-width: 760px){
+  #topleft{ width:calc(100vw - 32px); }
+  #topics .btn{ height:40px; font-size:14px; }
+  .sim-label{ flex-basis:7rem; font-size:11.5px; }
+}

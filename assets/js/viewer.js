@@ -364,12 +364,15 @@ export function createViewer(opts = {}) {
 
   const clock = new THREE.Clock();
   let prev = performance.now();
+  let paused = false;
 
   (function tick() {
     requestAnimationFrame(tick);
     const now = performance.now();
     const frameMs = now - prev;
     prev = now;
+
+    if (paused) { clock.getDelta(); return; }   /* a panel covers the canvas */
 
     applySize();
     const dt = Math.min(clock.getDelta(), 0.05);
@@ -387,6 +390,7 @@ export function createViewer(opts = {}) {
 
   return {
     renderer, scene, camera, controls, ready, THREE, refreshShadows,
+    setPaused(v) { paused = !!v; },
     get size() { return { w: cssW, h: cssH }; }
   };
 }

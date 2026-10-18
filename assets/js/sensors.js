@@ -1,4 +1,5 @@
 import { createViewer } from "./viewer.js";
+import { initConcepts } from "./concepts.js";
 
 /* p = position as fractions of the car's half-length (x, front = +), height (y), half-width (z).
    n = outward normal for hiding when facing away; null = interior, always shown. */
@@ -46,6 +47,7 @@ const segs = SENSORS.map(() => $("segs").appendChild(document.createElement("spa
 
 const viewer = createViewer({ canvas, autoRotate: false, onFrame: placeSpots });
 THREE = viewer.THREE;
+initConcepts(viewer);
 const tmp = new THREE.Vector3(), toCam = new THREE.Vector3();
 
 viewer.ready.then(({ size }) => {
