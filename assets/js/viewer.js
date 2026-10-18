@@ -223,6 +223,10 @@ export function createViewer(opts = {}) {
       controls.target.set(0, carSize.y * 0.44, 0);
       if (contact) contact.scale.set(carSize.x / 6.6 * 1.18, 1, carSize.z / 3.6 * 1.45);
 
+      /* static scene: draw the shadow map once more, then stop re-drawing it */
+      renderer.shadowMap.autoUpdate = false;
+      renderer.shadowMap.needsUpdate = true;
+
       modelReady = true; targetPct = 100;
       setTimeout(finishLoading, 1600);
       window.__car = model;
@@ -295,9 +299,11 @@ export function createViewer(opts = {}) {
       slider.disabled = !clipOn;
       row.classList.toggle("on", clipOn);
       applyClipping();
+      renderer.shadowMap.needsUpdate = true;
     });
     slider.addEventListener("input", () => {
       clipPlane.constant = Number(slider.value);
+      if (clipOn) renderer.shadowMap.needsUpdate = true;
     });
 
     const cutq = new URLSearchParams(location.search).get("cut");
@@ -311,23 +317,76 @@ export function createViewer(opts = {}) {
   }
 
   /* ---------------------------------------------------------------- loop */
-  const clock = new THREE.Clock();
-  function resize() {
-    const w = canvas.clientWidth, h = canvas.clientHeight;
-    if (canvas.width !== w || canvas.height !== h) {
-      renderer.setSize(w, h, false);
-      camera.aspect = w / h;
-      camera.updateProjectionMatrix();
+
+  /* Canvas size is tracked by a ResizeObserver rather than read every frame.
+     Reading clientWidth each frame forces a synchronous layout, and anything
+     drawing DOM overlays in onFrame (the sensor hotspots) writes styles just
+     before it, so the two together caused a layout recalculation per frame. */
+  let cssW = canvas.clientWidth || 1, cssH = canvas.clientHeight || 1, sizeDirty = true;
+  const ro = new ResizeObserver(entries => {
+    const r = entries[0].contentRect;
+    if (r.width && r.height) { cssW = r.width; cssH = r.height; sizeDirty = true; }
+  });
+  ro.observe(canvas);
+
+  function applySize() {
+    if (!sizeDirty) return;
+    sizeDirty = false;
+    renderer.setPixelRatio(dpr);
+    renderer.setSize(cssW, cssH, false);
+    camera.aspect = cssW / cssH;
+    camera.updateProjectionMatrix();
+  }
+
+  /* Adaptive resolution. A 293k-triangle PBR model at devicePixelRatio 2 is
+     four times the pixels of DPR 1, which is enough to miss the 16.7 ms frame
+     budget on integrated graphics and halve the refresh rate. If frames run
+     long we step the pixel ratio down, and back up again if there is headroom. */
+  const DPR_STEPS = [2, 1.75, 1.5, 1.25, 1];
+  let dprIdx = DPR_STEPS.findIndex(v => v <= Math.min(window.devicePixelRatio, 2));
+  if (dprIdx < 0) dprIdx = DPR_STEPS.length - 1;
+  let dpr = DPR_STEPS[dprIdx];
+  const worstAllowed = dprIdx;          /* never go below the device's own DPR tier */
+  let acc = 0, accFrames = 0, settle = 0;
+
+  function adaptQuality(frameMs) {
+    if (settle > 0) { settle--; return; }
+    acc += frameMs; accFrames++;
+    if (accFrames < 45) return;
+    const avg = acc / accFrames;
+    acc = 0; accFrames = 0;
+    if (avg > 21 && dprIdx < DPR_STEPS.length - 1) {
+      dprIdx++; dpr = DPR_STEPS[dprIdx]; sizeDirty = true; settle = 45;
+    } else if (avg < 11 && dprIdx > worstAllowed) {
+      dprIdx--; dpr = DPR_STEPS[dprIdx]; sizeDirty = true; settle = 90;
     }
   }
+
+  const clock = new THREE.Clock();
+  let prev = performance.now();
+
   (function tick() {
-    resize();
+    requestAnimationFrame(tick);
+    const now = performance.now();
+    const frameMs = now - prev;
+    prev = now;
+
+    applySize();
     const dt = Math.min(clock.getDelta(), 0.05);
     controls.update();
     if (onFrame) onFrame(dt, clock.elapsedTime);
     renderer.render(scene, camera);
-    requestAnimationFrame(tick);
+    adaptQuality(frameMs);
   })();
 
-  return { renderer, scene, camera, controls, ready, THREE };
+  /* The scene is static, so the shadow map only needs drawing once. Leaving
+     it on auto doubled the draw calls and triangles every single frame. */
+  function refreshShadows() {
+    renderer.shadowMap.needsUpdate = true;
+  }
+
+  return {
+    renderer, scene, camera, controls, ready, THREE, refreshShadows,
+    get size() { return { w: cssW, h: cssH }; }
+  };
 }

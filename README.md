@@ -12,6 +12,13 @@ python3 -m http.server 8099
 
 then visit <http://localhost:8099>. On GitHub Pages it just works.
 
+## Pages
+
+| Page | What it is |
+|---|---|
+| `index.html` | the car on its own, with a cutaway slider |
+| `sensors.html` | **Monitor or control?** &mdash; click the eight numbered sensors on the car, read how each one works, then classify it |
+
 ## Night driving (not on the site yet)
 
 `multibeam.html` is finished but deliberately **not linked from `index.html`**.
