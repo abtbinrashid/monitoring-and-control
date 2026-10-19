@@ -26,6 +26,14 @@
     <p class="load-label" id="loadLabel">Loading model</p>
     <div class="load-bar"><div class="load-fill" id="loadFill"></div></div>
     <p class="load-pct" id="loadPct">0%</p>
+    <div class="load-read" id="loadRead">
+      <p>The car is a 9.6&nbsp;MB model, so this takes a moment. Step 1 needs
+         no car &mdash; read it while you wait:</p>
+      <div class="lr-btns">
+        <button type="button" class="btn" data-open="control"><span class="k">01</span>Control systems</button>
+        <button type="button" class="btn" data-open="monitor"><span class="k">02</span>Monitor systems</button>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -33,24 +41,20 @@
 <div id="spots" hidden></div>
 
 <div id="dragHint" hidden aria-hidden="true">
-  <div class="dh-pill">
-    <span class="dh-arrow l">&larr;</span>
-    <span class="dh-hand">
-      <svg viewBox="0 0 20 20" width="17" height="17" fill="none" stroke="currentColor"
-           stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-        <path d="M6.9 9.4V4.7a1.1 1.1 0 0 1 2.2 0v4.1"/>
-        <path d="M9.1 8.8V3.8a1.1 1.1 0 0 1 2.2 0v5"/>
-        <path d="M11.3 8.8V5.1a1.1 1.1 0 0 1 2.2 0v5.6"/>
-        <path d="M6.9 9.4a1.1 1.1 0 0 0-2.2 0v3.2A5 5 0 0 0 9.7 17.6h1.4a4.4 4.4 0 0 0 4.4-4.4V8.6"/>
-      </svg>
-    </span>
-    <span class="dh-text">DRAG ME</span>
-    <span class="dh-arrow r">&rarr;</span>
+  <div class="dh-stage">
+    <span class="dh-ripple"></span>
+    <svg class="dh-finger" viewBox="0 0 26 28" width="36" height="38" aria-hidden="true">
+      <g fill="#fff" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round">
+        <path d="M9 15.6V5.4a2.1 2.1 0 0 1 4.2 0v7.2"/>
+        <path d="M13.2 13.4v-1.2a1.9 1.9 0 0 1 3.8 0v1.4"/>
+        <path d="M17 13.6v-.8a1.9 1.9 0 0 1 3.8 0V19a6.6 6.6 0 0 1-6.6 6.6h-1.3a5.6 5.6 0 0 1-4-1.7l-4.2-4.2a2 2 0 0 1 2.8-2.8l2.5 2.5"/>
+      </g>
+    </svg>
   </div>
+  <span class="dh-label">DRAG ME</span>
 </div>
 
 <div id="topleft">
-  <a id="backlink" href="model.html">&larr; JUST THE MODEL</a>
   <section id="guide" class="win" aria-labelledby="guideHead">
     <div class="group"><b id="guideHead">(START.HERE)</b><i></i></div>
     <ol id="steps">
@@ -73,6 +77,7 @@
     <p class="g-now" id="guideNow"></p>
   </section>
 
+  <a id="backlink" href="model.html">&larr; JUST THE MODEL</a>
   <nav id="topics" class="win" aria-label="Key ideas">
     <div class="group"><b>(TOPICS)</b><i></i></div>
     <button type="button" class="btn" data-topic="control"  aria-expanded="false"><span class="k">01</span>Control systems</button>

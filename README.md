@@ -35,10 +35,15 @@ It is the order the page wants to be used in, and it ticks itself off:
 Nothing is locked. Doing the steps out of order just ticks them off out of
 order, and the line under the list always names the step you are on.
 
-The **drag me** pill is not one of the cues: nothing about the canvas says it
-can be spun, so it stays on screen for the whole session and only fades back
-once you have dragged. It follows the car rather than the middle of the window,
-because opening a sensor offsets the whole view to the left.
+The **drag me** hint is not one of the cues: nothing about the canvas says it
+can be spun, so a finger swipes over the car until the first touch of it, which
+retires the hint for good. It is placed on the car rather than in the middle of
+the window, and kept out of the panels' box &mdash; beside the column on a
+desktop, below it on a phone.
+
+The model is 9.6&nbsp;MB over the wire, which is a real wait on a slow
+connection, so the loading screen offers step 1 while it downloads: both
+explainer panels open over it and need no car.
 
 ## Night driving (not on the site yet)
 

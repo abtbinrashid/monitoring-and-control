@@ -92,10 +92,10 @@ function placeSpots() {
   lastCam.q.copy(cam.quaternion);
   lastCam.w = w; lastCam.h = h;
 
-  /* the "drag me" pill belongs under the car, not under the middle of the
-     window: opening a sensor offsets the view and the car slides left */
+  /* the "drag me" hint belongs on the car, not in the middle of the window:
+     opening a sensor offsets the view and the car slides left */
   tmp.copy(centre).project(cam);
-  guide.trackX((tmp.x + 1) / 2 * w, w);
+  guide.track((tmp.x + 1) / 2 * w, (1 - tmp.y) / 2 * h + 8, w, h);
 
   for (let i = 0; i < pts.length; i++) {
     const el = spots[i], p = pts[i];
