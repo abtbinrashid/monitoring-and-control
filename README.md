@@ -41,9 +41,8 @@ retires the hint for good. It is placed on the car rather than in the middle of
 the window, and kept out of the panels' box &mdash; beside the column on a
 desktop, below it on a phone.
 
-The model is 9.6&nbsp;MB over the wire, which is a real wait on a slow
-connection, so the loading screen offers step 1 while it downloads: both
-explainer panels open over it and need no car.
+The hint waits for the model, since the loading panel covers the canvas until
+then.
 
 ## Night driving (not on the site yet)
 
@@ -81,47 +80,50 @@ control systems rather than monitoring ones.
 <https://sketchfab.com/3d-models/mercedes-benz-s-580-maybach-w223-6125a32ee10048ca96eee0c28b9c8b6c>
 
 The Sketchfab download is 16 files (`scene.gltf` + a 15 MB `scene.bin` + PNG
-textures). It is repackaged into a single `.glb`, which is a **lossless**
-container change &mdash; no geometry and no texture data is altered:
+textures). What ships is a single compressed `.glb`, built from it like this:
 
 ```bash
-npx @gltf-transform/cli copy scene.gltf car.glb
+GT="npx @gltf-transform/cli"
+$GT prune scene.gltf p1.glb --keep-attributes false --keep-solid-textures true
+$GT dedup   p1.glb p2.glb      # merge identical accessors and materials
+$GT weld    p2.glb p3.glb      # merge duplicate vertices
+$GT webp    p3.glb p4.glb --lossless true
+$GT meshopt p4.glb car.glb
 ```
 
-Verified by rendering both and comparing: **100.00% of pixels identical, maximum
-channel difference 0.**
+Then set `window.__modelBytes` in `assets/js/preload.js` to the new file size,
+or the loading bar lies.
 
-### Why it is not compressed further
+### What each step buys, and what it costs
 
-Lossy compression was tried and rejected. Measured against a render of the
-original, at the same camera:
+The weight was never the textures &mdash; all fourteen of them come to 2.7 MB,
+at most 1024&times;1024. It was geometry: 270k vertices carrying float32
+positions, normals, tangents and **three** UV sets, most of which no material
+ever reads. So the big win is lossless: `prune --keep-attributes false` throws
+away the attributes nothing uses.
 
-| Build | Over the wire | Pixels identical |
+| Build | Over the wire (gzip) | Load on a 5 Mbit line |
 |---|---|---|
-| Lossless single `.glb` (shipped) | 9.6 MB | **100.00%** |
-| meshopt geometry, PNG textures kept | 4.4 MB | 94.68% |
-| meshopt + lossy WebP textures | 1.8 MB | 90.06% |
+| Lossless single `.glb` (was shipped) | 9.16 MB | ~15 s |
+| meshopt only | 4.16 MB | ~7 s |
+| **prune + dedup + weld + meshopt + lossless WebP (shipped)** | **2.88 MB** | **~4.6 s** |
+| the same with WebP quality 92 | 2.03 MB | ~3.3 s |
 
-The small builds are visibly different &mdash; the lighting and interior change.
-Looking exactly like the original was the requirement, so the lossless build is
-shipped and the first load is around 9.6 MB. The loading bar exists because of
-this.
+`--lossless true` means the textures are **bit-identical** to the PNGs; WebP
+just stores them better. Only the geometry is approximated, by meshopt's
+quantisation. Rendered against the original at two cameras, 82% of pixels come
+out bit-identical, 0.1% differ by more than 24/255, and the mean difference is
+**0.63/255** &mdash; the changes are single-pixel shifts in highlights along
+chrome and wheel spokes, and are not visible side by side.
+
+Quality 92 WebP would take another 0.85 MB off, at the cost of touching the
+texture data. It was not needed to make the page feel quick.
 
 The model download is kicked off by a small inline script in `index.html`
-rather than waiting for `main.js`. Otherwise the 9.6 MB download cannot start
-until the 1.3 MB three.js module graph has been fetched and parsed; starting it
-during HTML parse runs the two in parallel. `main.js` reuses that in-flight
+rather than waiting for the module graph. Otherwise the download cannot start
+until the 1.3 MB of three.js has been fetched and parsed; starting it during
+HTML parse runs the two in parallel. `viewer.js` reuses that in-flight
 response, so the file is still only requested once.
-
-If a faster load ever matters more than being pixel-perfect, the middle row is
-the best trade:
-
-```bash
-npx @gltf-transform/cli meshopt scene.gltf car.glb
-```
-
-Then set `EXPECTED_BYTES` in `assets/js/main.js` to the new file size so the
-loading bar stays accurate.
 
 ## Seeing inside
 
@@ -135,7 +137,7 @@ Add `?cut=0.2` to the URL to open a view with the cutaway already on.
 
 ## Adjusting
 
-Everything you are likely to change is at the top of `assets/js/main.js`:
+Everything you are likely to change is at the top of `assets/js/viewer.js`:
 
 | Setting | What it does |
 |---|---|
@@ -153,7 +155,7 @@ You can also test angles without editing anything by adding a query string:
 ```
 index.html              the page
 assets/css/style.css    styling
-assets/js/main.js       scene, lighting, camera, model loading
+assets/js/viewer.js     scene, lighting, camera, model loading
 assets/models/car.glb   the model (replace this)
 vendor/                 three.js r169 + loaders, vendored so there is no CDN
 ```

@@ -269,7 +269,7 @@ export function createViewer(opts = {}) {
       status.innerHTML = '<div class="load-help">' +
         (dropped
           ? "<strong>Could not download the model</strong><p>The connection " +
-            "dropped partway through the 9.6&nbsp;MB download. This usually means " +
+            "dropped partway through the 2.9&nbsp;MB download. This usually means " +
             "a slow or unstable network rather than a problem with the page.</p>" +
             '<button id="retryBtn" type="button">Try again</button>'
           : "<strong>No model found</strong><p>Save a car model as " +

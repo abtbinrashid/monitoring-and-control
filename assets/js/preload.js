@@ -7,7 +7,7 @@
    ========================================================================== */
 (function () {
   window.__modelURL   = "assets/models/car.glb";
-  window.__modelBytes = 17416816;
+  window.__modelBytes = 3865460;
 
   window.__modelFetch = (async () => {
     const res = await fetch(window.__modelURL);

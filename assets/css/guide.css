@@ -117,16 +117,6 @@
   100% { transform:scale(.5);  opacity:0; }
 }
 
-/* ---------- step 1 while the model downloads ---------- */
-.load-read{ margin:1.6rem 0 0; max-width:25rem; text-align:left; }
-.load-read p{ margin:0 0 .8rem; font:14px/1.55 var(--sans); color:#5d6168; text-wrap:pretty; }
-.lr-btns{ display:flex; flex-direction:column; gap:8px; }
-.lr-btns .btn{ height:42px; font-size:15px; justify-content:flex-start; padding:0 14px; }
-.lr-btns .btn .k{
-  font:600 12px/1 var(--mono); color:var(--muted);
-  background:var(--face-hi); border-radius:2px; padding:4px 5px;
-}
-
 @media (prefers-reduced-motion: reduce){
   .dh-stage, .dh-finger, .dh-ripple, .step.now .s-n, .btn.cue, #progress.cue{ animation:none; }
   .dh-ripple{ opacity:.55; }
@@ -149,5 +139,4 @@
   .step:not(.done) .s-mark{ display:none; }
   .g-now{ margin-top:9px; font-size:11.5px; }
   .dh-label{ font-size:11px; }
-  .load-read{ margin-top:1.2rem; }
 }

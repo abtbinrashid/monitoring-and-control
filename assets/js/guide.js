@@ -92,12 +92,6 @@ export function initGuide({ viewer, canvas, total }) {
     render();
   });
 
-  /* the same two panels, reachable from the loading screen */
-  document.querySelectorAll("[data-open]").forEach(b => b.addEventListener("click", () => {
-    const t = document.querySelector(`[data-topic="${b.dataset.open}"]`);
-    if (t) t.click();
-  }));
-
   /* Put the hint on the car. Its own size is measured once rather than every
      frame, because this runs inside the render loop, and it is kept clear of
      the left-hand column so it cannot sit under the panels. */
