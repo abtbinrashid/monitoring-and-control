@@ -232,7 +232,7 @@ function mountSim() {
 function stopSim() { cancelAnimationFrame(simRAF); simRAF = 0; }
 
 /* ------------------------------------------------------------------ dialog */
-export function initConcepts(viewer) {
+export function initConcepts(viewer, opts = {}) {
   const back = $("infoBack"), body = $("infoBody"), fileEl = $("infoFile");
   const buttons = [...document.querySelectorAll("[data-topic]")];
   let openKey = null, lastFocus = null;
@@ -244,6 +244,7 @@ export function initConcepts(viewer) {
        close(), so stop the previous panel's animation here as well */
     stopSim();
     openKey = key;
+    if (opts.onOpen) opts.onOpen(key);          /* the guide ticks step 1 off */
     lastFocus = document.activeElement;
     fileEl.textContent = topic.file;
     body.innerHTML = `<h2>${topic.title}</h2>` + topic.body();

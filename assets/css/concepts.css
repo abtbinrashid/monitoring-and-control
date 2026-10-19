@@ -8,6 +8,10 @@
   position:fixed; top:16px; left:16px; z-index:30;
   width:min(22rem, calc(100vw - 32px));
   display:flex; flex-direction:column; gap:12px;
+  /* four panels stack up here, so let the column scroll on a short screen
+     rather than pushing the quiz progress off the bottom */
+  max-height:calc(100vh - 72px); overflow-y:auto; overscroll-behavior:contain;
+  padding-right:2px;
 }
 #progress{ position:static; width:auto; }
 

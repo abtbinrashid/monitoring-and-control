@@ -16,8 +16,29 @@ then visit <http://localhost:8099>. On GitHub Pages it just works.
 
 | Page | What it is |
 |---|---|
-| `index.html` | the car on its own, with a cutaway slider |
-| `sensors.html` | **Monitor or control?** &mdash; click the eight numbered sensors on the car, read how each one works, then classify it |
+| `index.html` | **Monitor or control?** &mdash; the home page: click the eight numbered sensors on the car, read how each one works, then classify it |
+| `model.html` | the car on its own, with a cutaway slider |
+| `sensors.html` | a redirect, kept so old links to the quiz still work |
+
+## The three steps
+
+`assets/js/guide.js` runs a small guide at the top of the left-hand column.
+It is the order the page wants to be used in, and it ticks itself off:
+
+1. **Read** &mdash; open *Control systems* and *Monitor systems*. Until both are
+   open, those two buttons wear a pulsing ring.
+2. **Drag** &mdash; a press on the canvas that travels more than 28 px. A click on
+   a hotspot and a wheel zoom both leave the camera alone, so neither counts.
+3. **Quiz** &mdash; classify all eight sensors. While this is the current step the
+   progress panel is ringed.
+
+Nothing is locked. Doing the steps out of order just ticks them off out of
+order, and the line under the list always names the step you are on.
+
+The **drag me** pill is not one of the cues: nothing about the canvas says it
+can be spun, so it stays on screen for the whole session and only fades back
+once you have dragged. It follows the car rather than the middle of the window,
+because opening a sensor offsets the whole view to the left.
 
 ## Night driving (not on the site yet)
 

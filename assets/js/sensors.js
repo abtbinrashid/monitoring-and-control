@@ -1,5 +1,6 @@
 import { createViewer } from "./viewer.js";
 import { initConcepts } from "./concepts.js";
+import { initGuide } from "./guide.js";
 
 /* p = position as fractions of the car's half-length (x, front = +), height (y), half-width (z).
    n = outward normal for hiding when facing away; null = interior, always shown. */
@@ -47,8 +48,10 @@ const segs = SENSORS.map(() => $("segs").appendChild(document.createElement("spa
 
 const viewer = createViewer({ canvas, autoRotate: false, onFrame: placeSpots });
 THREE = viewer.THREE;
-initConcepts(viewer);
+const guide = initGuide({ viewer, canvas, total: TOTAL });
+initConcepts(viewer, { onOpen: key => guide.topicOpened(key) });
 const tmp = new THREE.Vector3(), toCam = new THREE.Vector3();
+const centre = new THREE.Vector3(0, 0.72, 0);   /* what the camera orbits */
 
 viewer.ready.then(({ size }) => {
   pts = SENSORS.map(s => new THREE.Vector3(FRONT * s.p[0] * size.x / 2, s.p[1] * size.y, s.p[2] * size.z / 2));
@@ -88,6 +91,11 @@ function placeSpots() {
   lastCam.p.copy(cam.position);
   lastCam.q.copy(cam.quaternion);
   lastCam.w = w; lastCam.h = h;
+
+  /* the "drag me" pill belongs under the car, not under the middle of the
+     window: opening a sensor offsets the view and the car slides left */
+  tmp.copy(centre).project(cam);
+  guide.trackX((tmp.x + 1) / 2 * w, w);
 
   for (let i = 0; i < pts.length; i++) {
     const el = spots[i], p = pts[i];
@@ -141,6 +149,7 @@ function refresh() {
   $("doneText").textContent = `${done}/${TOTAL} completed`;
   $("scoreText").textContent = `${right} correct`;
   $("statusMsg").textContent = `${done}/${TOTAL} completed`;
+  guide.quizProgress(done);
   segs.forEach((el, i) => { el.className = answers[i] ? (answers[i].correct ? "ok" : "bad") : ""; });
   spots.forEach((el, i) => {
     const a = answers[i];
