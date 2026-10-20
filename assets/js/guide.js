@@ -10,15 +10,13 @@
    be spun, so a finger swipes over the car until the first touch of it.
    ========================================================================== */
 
+import { t, onLangChange } from "./lang.js";
+
 const $ = id => document.getElementById(id);
 
 const NEEDED = ["control", "monitor"];      /* the two panels step 1 asks for */
 
-const NOW = {
-  read: "Open 01 and 02 below.",
-  drag: "Drag anywhere on the car to spin it.",
-  quiz: "Click a numbered sensor on the car."
-};
+const NOW = { read: "nowRead", drag: "nowDrag", quiz: "nowQuiz" };
 
 export function initGuide({ viewer, canvas, total }) {
   const stepsEl = $("steps");
@@ -36,6 +34,7 @@ export function initGuide({ viewer, canvas, total }) {
                      done >= total;
 
   function render() {
+    const L = t();
     const current = steps.find(el => !isDone(el.dataset.step));
 
     steps.forEach(el => {
@@ -43,14 +42,14 @@ export function initGuide({ viewer, canvas, total }) {
       el.classList.toggle("done", ok);
       el.classList.toggle("now", now);
       el.querySelector(".s-mark").textContent = ok ? "✓" : "";
-      el.querySelector(".s-stat").textContent = ok ? "Done." : now ? "Do this next." : "";
+      el.querySelector(".s-stat").textContent = ok ? L.stepDone : now ? L.stepNext : "";
       if (now) el.setAttribute("aria-current", "step");
       else el.removeAttribute("aria-current");
     });
 
-    $("quizCount").textContent = done ? ` — ${done}/${total} done` : "";
+    $("quizCount").textContent = done ? L.quizCount(done, total) : "";
     const line = $("guideNow");
-    line.textContent = current ? NOW[current.dataset.step] : "All three done. Nice.";
+    line.textContent = current ? L[NOW[current.dataset.step]] : L.nowDone;
     line.classList.toggle("done", !current);
 
     /* ring whatever the current step is about */
@@ -108,6 +107,7 @@ export function initGuide({ viewer, canvas, total }) {
     }
     return colRect;
   }
+  onLangChange(() => { colRect = null; hintW = 0; hintX = hintY = -1; render(); });
   render();
 
   return {

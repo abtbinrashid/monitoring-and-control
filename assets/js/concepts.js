@@ -1,20 +1,27 @@
 /* ==========================================================================
    concepts.js — the three explainer panels: control systems, monitoring
    systems, and feedback. Each opens over a blurred page.
+
+   All wording lives in lang.js; this file only lays it out. The diagrams are
+   mirrored in Arabic, so the signal still runs the way the language reads.
    ========================================================================== */
 
+import { concepts as L, t, getLang, onLangChange } from "./lang.js";
+
 const $ = id => document.getElementById(id);
+const rtl = () => getLang() === "ar";
 
 /* ------------------------------------------------------------------ diagram */
 /* One renderer for every diagram, so the three read as the same language:
-   boxes left to right, a marching line for the signal, and a return line
-   underneath only where a feedback loop actually exists.                   */
+   boxes along the reading direction, a marching line for the signal, and a
+   return line underneath only where a feedback loop actually exists.       */
 function chain(nodes, opt = {}) {
   const NW = 170, NH = 88, GAP = 46, P = 16;
   const drop = opt.feedback || opt.noFeedback ? 74 : 26;
   const W = P * 2 + nodes.length * NW + (nodes.length - 1) * GAP;
   const H = P + NH + drop;
-  const xOf = i => P + i * (NW + GAP);
+  const flip = rtl();
+  const xOf = i => P + (flip ? nodes.length - 1 - i : i) * (NW + GAP);
   const midY = P + NH / 2;
 
   let s = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${opt.alt || "process diagram"}">
@@ -32,7 +39,11 @@ function chain(nodes, opt = {}) {
       s += `<text class="d-sub" x="${x + NW / 2}" y="${P + 50 + k * 15}" text-anchor="middle">${line}</text>`;
     });
     if (i < nodes.length - 1) {
-      s += `<line class="d-flow" x1="${x + NW + 5}" y1="${midY}" x2="${xOf(i + 1) - 7}" y2="${midY}"
+      /* drawn from this box towards the next one, so the arrowhead turns
+         round on its own when the layout is mirrored */
+      const from = flip ? x - 5 : x + NW + 5;
+      const to   = flip ? xOf(i + 1) + NW + 7 : xOf(i + 1) - 7;
+      s += `<line class="d-flow" x1="${from}" y1="${midY}" x2="${to}" y2="${midY}"
              style="color:var(--signal)" marker-end="url(#ah)"/>`;
     }
   });
@@ -58,106 +69,74 @@ function chain(nodes, opt = {}) {
   return `<div class="diagram">${s}</svg></div>`;
 }
 
+/* nodes arrive as [title, sub1, sub2]; kinds are positional and fixed */
+const boxes = (rows, kinds = {}) =>
+  rows.map(([title, ...sub], i) => ({ title, sub, kind: kinds[i] || "" }));
+
 /* ------------------------------------------------------------------ content */
 const TOPICS = {
-  control: {
-    file: "CONTROL.DOC",
-    title: "Control systems",
-    body: () => `
-      <p class="kicker">Definition</p>
-      <div class="defn"><b>CONTROL SYSTEM</b>A type of system where sensors feed data to a microprocessor, which compares it against present target values and uses actuators to change the physical conditions.</div>
-      <h3>THE PROCESS</h3>
-      ${chain([
-        { title: "Sensor", sub: ["measures the physical", "condition continuously"] },
-        { title: "ADC", sub: ["converts the analogue", "signal to digital"] },
-        { title: "Microprocessor", sub: ["compares the reading", "with the target value"], kind: "proc" },
-        { title: "DAC", sub: ["converts the decision", "back to analogue"] },
-        { title: "Actuator", sub: ["changes the physical", "condition"], kind: "act" }
-      ], { feedback: "the change is measured again", alt: "control system process" })}
-      <p>The actuator is what makes it a control system. Because the actuator changes
-         the very thing the sensor is measuring, the next reading is a consequence of
-         the last action, so the loop closes and the system corrects itself without a person.</p>
-    `
+  control: () => {
+    const c = L().control;
+    return {
+      file: c.file, title: c.title,
+      body: `
+      <p class="kicker">${L().defnWord}</p>
+      <div class="defn"><b>${c.label}</b>${c.defn}</div>
+      <h3>${L().process}</h3>
+      ${chain(boxes(c.nodes, { 2: "proc", 4: "act" }), { feedback: c.loop, alt: c.alt })}
+      <p>${c.prose}</p>`
+    };
   },
 
-  monitor: {
-    file: "MONITOR.DOC",
-    title: "Monitoring systems",
-    body: () => `
-      <p class="kicker">Definition</p>
-      <div class="defn"><b>MONITOR SYSTEM</b>A type of system where sensors collect data and log it or trigger an alarm without changing the physical environment.</div>
-      <h3>THE PROCESS</h3>
-      ${chain([
-        { title: "Sensor", sub: ["measures the physical", "condition continuously"] },
-        { title: "ADC", sub: ["converts the analogue", "signal to digital"] },
-        { title: "Microprocessor", sub: ["records the reading, or", "checks it against a limit"], kind: "proc" },
-        { title: "Display / alarm", sub: ["shows the value or", "raises a warning"], kind: "out" },
-        { title: "Person", sub: ["decides whether", "to do anything"], kind: "out" }
-      ], { noFeedback: "no actuator, so no feedback loop", alt: "monitoring system process" })}
-      <p>Everything up to the microprocessor is identical to a control system. The
-         difference is the end of the chain: there is no actuator, so nothing the
-         system does changes the condition being measured. It reports, and a person
-         decides.</p>
-      <div class="note">A display, a lamp and a buzzer are <strong>output devices</strong>,
-        not actuators. They pass information to a person; they do not change the process.</div>
-    `
+  monitor: () => {
+    const c = L().monitor;
+    return {
+      file: c.file, title: c.title,
+      body: `
+      <p class="kicker">${L().defnWord}</p>
+      <div class="defn"><b>${c.label}</b>${c.defn}</div>
+      <h3>${L().process}</h3>
+      ${chain(boxes(c.nodes, { 2: "proc", 3: "out", 4: "out" }), { noFeedback: c.loop, alt: c.alt })}
+      <p>${c.prose}</p>
+      <div class="note">${c.note}</div>`
+    };
   },
 
-  feedback: {
-    file: "FEEDBACK.DOC",
-    title: "Feedback",
-    body: () => `
-      <p class="kicker">Feedback &middot; feedback loops</p>
-      <p>Before saying why feedback matters, it has to be clear what feedback actually is.</p>
-      <div class="defn"><b>FEEDBACK LOOP</b>A feedback loop is when a control system uses its output to influence its next input.</div>
-      <p>That is the whole idea. The system acts, the action changes the physical
-         conditions, and the sensor then measures those changed conditions. So the
-         result of one action becomes the input to the next decision.</p>
-      <h3>WHY IT MATTERS</h3>
-      <ul>
-        <li>It lets a system <strong>adjust itself automatically</strong> to stay within
-            set conditions, with nobody watching it.</li>
-        <li>It lets the system <strong>check whether it is actually working as
-            expected</strong>, rather than assuming that its last action worked.</li>
-      </ul>
-      <h3>AN EXAMPLE FROM THIS CAR</h3>
-      <p>The anti-lock braking system is sensor 8. The magnetic field sensor counts how
-         fast the wheel is turning. If the microprocessor sees the wheel suddenly stop
-         while the car is still moving, it knows the tyre has locked and is skidding,
-         so it releases the brake pressure at that wheel. The wheel starts turning
-         again &mdash; and the same sensor measures that straight away. That new reading
-         decides what the system does next, many times a second.</p>
-      ${chain([
-        { title: "Wheel speed sensor", sub: ["counts the teeth", "passing the sensor"] },
-        { title: "Microprocessor", sub: ["compares wheel speed", "with the car's speed"], kind: "proc" },
-        { title: "Brake valve", sub: ["releases or reapplies", "the brake pressure"], kind: "act" },
-        { title: "Wheel", sub: ["speeds up again", "or slows down"] }
-      ], { feedback: "the new wheel speed is measured", alt: "braking feedback loop" })}
-      <h3>TRY BREAKING THE LOOP</h3>
-      <p>The driver is braking as hard as they can. Watch what the feedback loop does
-         with that, and then disconnect it.</p>
+  feedback: () => {
+    const c = L().feedback;
+    return {
+      file: c.file, title: c.title, mount: mountSim,
+      body: `
+      <p class="kicker">${c.kicker}</p>
+      <p>${c.intro}</p>
+      <div class="defn"><b>${c.label}</b>${c.defn}</div>
+      <p>${c.after}</p>
+      <h3>${c.whyHead}</h3>
+      <ul>${c.why.map(li => `<li>${li}</li>`).join("")}</ul>
+      <h3>${c.exHead}</h3>
+      <p>${c.example}</p>
+      ${chain(boxes(c.nodes, { 1: "proc", 2: "act" }), { feedback: c.loop, alt: c.alt })}
+      <h3>${c.tryHead}</h3>
+      <p>${c.tryIntro}</p>
       <div class="sim" id="sim">
         <div class="sim-row">
-          <span class="sim-label">Wheel speed</span>
+          <span class="sim-label">${c.wheelLabel}</span>
           <span class="sim-meter"><span class="sim-fill" id="simWheel" style="width:100%"></span></span>
           <span class="sim-val" id="simWheelV">100%</span>
         </div>
         <div class="sim-row">
-          <span class="sim-label">Brake pressure</span>
+          <span class="sim-label">${c.brakeLabel}</span>
           <span class="sim-meter"><span class="sim-fill brake" id="simBrake" style="width:0%"></span></span>
           <span class="sim-val" id="simBrakeV">0%</span>
         </div>
-        <p class="sim-state ok" id="simState">Gripping &mdash; the wheel is still turning</p>
+        <p class="sim-state ok" id="simState">${c.gripping}</p>
         <div class="sim-controls">
-          <button type="button" class="btn" id="simToggle">Disconnect the sensor</button>
-          <button type="button" class="btn" id="simReset">Reset</button>
+          <button type="button" class="btn" id="simToggle">${c.disconnect}</button>
+          <button type="button" class="btn" id="simReset">${c.reset}</button>
         </div>
       </div>
-      <div class="note warn" id="simNote">With the sensor disconnected the microprocessor
-        gets no new readings, so it never finds out the wheel has locked and never
-        releases the brake. That is what feedback is protecting against.</div>
-    `,
-    mount: mountSim
+      <div class="note warn" id="simNote">${c.warn}</div>`
+    };
   }
 };
 
@@ -165,6 +144,7 @@ const TOPICS = {
 let simRAF = 0;
 
 function mountSim() {
+  const c = L().feedback;
   const wheelEl = $("simWheel"), brakeEl = $("simBrake");
   const wheelV = $("simWheelV"), brakeV = $("simBrakeV");
   const stateEl = $("simState"), toggle = $("simToggle"), reset = $("simReset");
@@ -177,7 +157,7 @@ function mountSim() {
 
   function setLoop(on) {
     feedback = on;
-    toggle.textContent = on ? "Disconnect the sensor" : "Reconnect the sensor";
+    toggle.textContent = on ? c.disconnect : c.reconnect;
     note.style.display = on ? "none" : "";
     if (fbPath) {
       fbPath.setAttribute("class", on ? "d-fb" : "d-none");
@@ -185,7 +165,7 @@ function mountSim() {
       if (on) fbPath.setAttribute("marker-end", "url(#ah)");
     }
     if (fbLabel) {
-      fbLabel.textContent = on ? "the new wheel speed is measured" : "loop broken — no new readings";
+      fbLabel.textContent = on ? c.loop : c.broken;
       fbLabel.setAttribute("class", on ? "d-fb-label" : "d-none-label");
     }
   }
@@ -215,9 +195,7 @@ function mountSim() {
     if (!wheelEl.isConnected) { stopSim(); return; }   /* panel was replaced */
 
     stateEl.className = "sim-state " + (locked ? "bad" : "ok");
-    stateEl.innerHTML = locked
-      ? "Locked &mdash; the tyre is skidding and you cannot steer"
-      : "Gripping &mdash; the wheel is still turning";
+    stateEl.innerHTML = locked ? c.locked : c.gripping;
 
     simRAF = requestAnimationFrame(step);
   }
@@ -237,21 +215,25 @@ export function initConcepts(viewer, opts = {}) {
   const buttons = [...document.querySelectorAll("[data-topic]")];
   let openKey = null, lastFocus = null;
 
+  function draw(key) {
+    const topic = TOPICS[key]();
+    fileEl.textContent = topic.file;
+    body.innerHTML = `<h2>${topic.title}</h2>` + topic.body;
+    body.scrollTop = 0;
+    if (topic.mount) topic.mount();
+  }
+
   function open(key) {
-    const topic = TOPICS[key];
-    if (!topic) return;
+    if (!TOPICS[key]) return;
     /* switching straight from one topic to another never passes through
        close(), so stop the previous panel's animation here as well */
     stopSim();
     openKey = key;
-    if (opts.onOpen) opts.onOpen(key);          /* the guide ticks step 1 off */
     lastFocus = document.activeElement;
-    fileEl.textContent = topic.file;
-    body.innerHTML = `<h2>${topic.title}</h2>` + topic.body();
-    body.scrollTop = 0;
+    if (opts.onOpen) opts.onOpen(key);          /* the guide ticks step 1 off */
+    draw(key);
     back.hidden = false;
     buttons.forEach(b => b.setAttribute("aria-expanded", String(b.dataset.topic === key)));
-    if (topic.mount) topic.mount();
     if (viewer && viewer.setPaused) viewer.setPaused(true);   /* don't re-blur a live canvas */
     $("infoClose").focus();
   }
@@ -271,6 +253,9 @@ export function initConcepts(viewer, opts = {}) {
     openKey === b.dataset.topic ? close() : open(b.dataset.topic);
   }));
   $("infoClose").addEventListener("click", close);
+
+  /* a panel that is open when the language changes is redrawn in place */
+  onLangChange(() => { if (openKey) { stopSim(); draw(openKey); } });
 
   /* ?topic=feedback opens a panel straight away, so a topic can be linked to */
   const wanted = new URLSearchParams(location.search).get("topic");

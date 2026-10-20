@@ -40,10 +40,10 @@
 
 .g-now{
   margin:10px 0 0; padding:7px 9px;
-  background:var(--face-hi); border-left:3px solid var(--signal);
+  background:var(--face-hi); border-inline-start:3px solid var(--signal);
   font:600 12.5px/1.45 var(--mono); color:#2b2f36;
 }
-.g-now.done{ border-left-color:var(--ok); color:var(--ok); }
+.g-now.done{ border-inline-start-color:var(--ok); color:var(--ok); }
 
 .vh{ position:absolute; width:1px; height:1px; margin:-1px; padding:0; overflow:hidden; clip-path:inset(50%); white-space:nowrap; }
 
@@ -139,4 +139,16 @@
   .step:not(.done) .s-mark{ display:none; }
   .g-now{ margin-top:9px; font-size:11.5px; }
   .dh-label{ font-size:11px; }
+}
+
+/* ---------- Arabic ---------- */
+[lang="ar"] .step{ font-size:13px; line-height:1.6; letter-spacing:0; }
+[lang="ar"] .g-now{ font-family:var(--sans); font-size:12.5px; line-height:1.7; }
+[lang="ar"] .dh-label{ font-family:var(--sans); letter-spacing:0; font-size:12px; }
+[lang="ar"] .s-n{ direction:ltr; }
+@media (max-width: 760px){
+  [lang="ar"] .step[data-step="read"]::after{ content:"اقرأ"; }
+  [lang="ar"] .step[data-step="drag"]::after{ content:"اسحب"; }
+  [lang="ar"] .step[data-step="quiz"]::after{ content:"الاختبار"; }
+  [lang="ar"] .step::after{ font-family:var(--sans); font-size:12px; }
 }

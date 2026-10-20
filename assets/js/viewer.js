@@ -9,6 +9,7 @@ import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
 import { GLTFLoader }     from "three/addons/loaders/GLTFLoader.js";
 import { DRACOLoader }    from "three/addons/loaders/DRACOLoader.js";
 import { MeshoptDecoder } from "three/addons/libs/meshopt_decoder.module.js";
+import { t } from "./lang.js";
 
 const SOURCES = ["assets/models/car.glb", "assets/models/car/scene.gltf"];
 const TARGET_LENGTH = 5.3;         /* metres, the model is scaled to this */
@@ -143,7 +144,7 @@ export function createViewer(opts = {}) {
     if (finished || !status) return;
     finished = true;
     shownPct = 100; paintProgress();
-    if (loadLabel) loadLabel.textContent = "Ready";
+    if (loadLabel) loadLabel.textContent = t().ready;
     status.classList.add("done");
     setTimeout(() => status.remove(), 480);
   }
@@ -162,7 +163,7 @@ export function createViewer(opts = {}) {
   window.__onModelProgress = (loaded, total) => {
     targetPct = Math.min(96, (loaded / (total || window.__modelBytes)) * 96);
     if (loadLabel) {
-      loadLabel.textContent = targetPct >= 95.5 ? "Preparing model" : "Loading model";
+      loadLabel.textContent = targetPct >= 95.5 ? t().preparing : t().loading;
     }
   };
 
@@ -258,7 +259,7 @@ export function createViewer(opts = {}) {
       if (!status) return;
       if (attempt < 1 && lastError) {
         attempt++;
-        if (loadLabel) loadLabel.textContent = "Connection dropped, retrying";
+        if (loadLabel) loadLabel.textContent = t().retrying;
         targetPct = 0; shownPct = 0; lastError = null;
         tryLoad(0);
         return;
@@ -266,15 +267,12 @@ export function createViewer(opts = {}) {
       status.classList.remove("done");
       const dropped = lastError &&
         !/404|not found/i.test(String(lastError && lastError.message));
+      const L = t();
       status.innerHTML = '<div class="load-help">' +
         (dropped
-          ? "<strong>Could not download the model</strong><p>The connection " +
-            "dropped partway through the 2.9&nbsp;MB download. This usually means " +
-            "a slow or unstable network rather than a problem with the page.</p>" +
-            '<button id="retryBtn" type="button">Try again</button>'
-          : "<strong>No model found</strong><p>Save a car model as " +
-            "<code>assets/models/car.glb</code>, then reload. See " +
-            "<code>README.md</code>.</p>") + "</div>";
+          ? `<strong>${L.failTitle}</strong><p>${L.failBody}</p>` +
+            `<button id="retryBtn" type="button">${L.failRetry}</button>`
+          : `<strong>${L.missingTitle}</strong><p>${L.missingBody}</p>`) + "</div>";
       const b = document.getElementById("retryBtn");
       if (b) b.onclick = () => location.reload();
     }

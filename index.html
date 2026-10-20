@@ -6,7 +6,7 @@
 <title>Monitor or control? — S 580 sensors</title>
 <link rel="icon" href="favicon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Sans+Arabic:wght@400;500;600&display=swap">
 <link rel="stylesheet" href="assets/css/sensors.css">
 <link rel="stylesheet" href="assets/css/concepts.css">
 <link rel="stylesheet" href="assets/css/guide.css">
@@ -23,7 +23,7 @@
 <body>
 <div id="loading">
   <div class="load-box">
-    <p class="load-label" id="loadLabel">Loading model</p>
+    <p class="load-label" id="loadLabel" data-i18n="loading">Loading model</p>
     <div class="load-bar"><div class="load-fill" id="loadFill"></div></div>
     <p class="load-pct" id="loadPct">0%</p>
   </div>
@@ -43,44 +43,44 @@
       </g>
     </svg>
   </div>
-  <span class="dh-label">DRAG ME</span>
+  <span class="dh-label" data-i18n="dragMe">DRAG ME</span>
 </div>
 
 <div id="topleft">
   <section id="guide" class="win" aria-labelledby="guideHead">
-    <div class="group"><b id="guideHead">(START.HERE)</b><i></i></div>
+    <div class="group"><b id="guideHead" data-i18n="guideFile">(START.HERE)</b><i></i></div>
     <ol id="steps">
       <li class="step" data-step="read">
         <span class="s-n">1</span>
-        <span class="s-t">Read <b>Control systems</b> and <b>Monitor systems</b></span>
+        <span class="s-t" data-i18n-html="step1">Read <b>Control systems</b> and <b>Monitor systems</b></span>
         <span class="s-mark" aria-hidden="true"></span><span class="s-stat vh"></span>
       </li>
       <li class="step" data-step="drag">
         <span class="s-n">2</span>
-        <span class="s-t">Drag the car to look all around it</span>
+        <span class="s-t" data-i18n="step2">Drag the car to look all around it</span>
         <span class="s-mark" aria-hidden="true"></span><span class="s-stat vh"></span>
       </li>
       <li class="step" data-step="quiz">
         <span class="s-n">3</span>
-        <span class="s-t">Complete the quiz<span id="quizCount"></span></span>
+        <span class="s-t"><span data-i18n="step3">Complete the quiz</span><span id="quizCount"></span></span>
         <span class="s-mark" aria-hidden="true"></span><span class="s-stat vh"></span>
       </li>
     </ol>
     <p class="g-now" id="guideNow"></p>
   </section>
 
-  <a id="backlink" href="model.html">&larr; JUST THE MODEL</a>
-  <nav id="topics" class="win" aria-label="Key ideas">
-    <div class="group"><b>(TOPICS)</b><i></i></div>
-    <button type="button" class="btn" data-topic="control"  aria-expanded="false"><span class="k">01</span>Control systems</button>
-    <button type="button" class="btn" data-topic="monitor"  aria-expanded="false"><span class="k">02</span>Monitor systems</button>
-    <button type="button" class="btn" data-topic="feedback" aria-expanded="false"><span class="k">03</span>The importance of feedback</button>
+  <a id="backlink" href="model.html" data-i18n="backlink">&larr; JUST THE MODEL</a>
+  <nav id="topics" class="win" data-i18n-aria="topicsAria" aria-label="Key ideas">
+    <div class="group"><b data-i18n="topicsFile">(TOPICS)</b><i></i></div>
+    <button type="button" class="btn" data-topic="control"  aria-expanded="false"><span class="k">01</span><span data-i18n="topicControl">Control systems</span></button>
+    <button type="button" class="btn" data-topic="monitor"  aria-expanded="false"><span class="k">02</span><span data-i18n="topicMonitor">Monitor systems</span></button>
+    <button type="button" class="btn" data-topic="feedback" aria-expanded="false"><span class="k">03</span><span data-i18n="topicFeedback">The importance of feedback</span></button>
   </nav>
 
   <section id="progress" class="win">
-    <div class="group"><b>(SENSORS.CTL)</b><i></i></div>
-    <h1>Monitor or control?</h1>
-    <p class="lead">Click a numbered sensor on the car, read how it works, then decide which kind of system it is.</p>
+    <div class="group"><b data-i18n="progFile">(SENSORS.CTL)</b><i></i></div>
+    <h1 data-i18n="heading">Monitor or control?</h1>
+    <p class="lead" data-i18n="lead">Click a numbered sensor on the car, read how it works, then decide which kind of system it is.</p>
     <div class="prog-head"><span id="doneText">0/8 completed</span><span id="scoreText">0 correct</span></div>
     <div class="segs" id="segs"></div>
   </section>
@@ -89,19 +89,19 @@
 <aside id="win" class="win" hidden role="dialog" aria-labelledby="winName">
   <header class="titlebar">
     <span id="winFile">SENSOR_01.SYS</span>
-    <button type="button" class="tb-btn" id="winClose" aria-label="Close">&times;</button>
+    <button type="button" class="tb-btn" id="winClose" data-i18n-aria="close" aria-label="Close">&times;</button>
   </header>
   <div class="win-body">
     <p class="kicker" id="winKicker">Sensor 1 of 8</p>
     <h2 id="winName"></h2>
-    <div class="field-head"><b>DESCRIPTION.TXT</b><span>(Read-only)</span></div>
+    <div class="field-head"><b data-i18n="descFile">DESCRIPTION.TXT</b><span data-i18n="readOnly">(Read-only)</span></div>
     <div class="field" id="winText"></div>
   </div>
   <footer class="win-foot">
-    <p class="q" id="winQ">Is this a monitoring system or a control system?</p>
+    <p class="q" id="winQ" data-i18n="question">Is this a monitoring system or a control system?</p>
     <div class="btns">
-      <button type="button" class="btn" data-pick="Monitor">Monitor</button>
-      <button type="button" class="btn" data-pick="Control">Control</button>
+      <button type="button" class="btn" data-pick="Monitor" data-i18n="monitor">Monitor</button>
+      <button type="button" class="btn" data-pick="Control" data-i18n="control">Control</button>
     </div>
   </footer>
 </aside>
@@ -110,7 +110,7 @@
   <article class="win" id="infoWin" role="dialog" aria-modal="true" aria-labelledby="infoFile">
     <header class="titlebar">
       <span id="infoFile">CONTROL.DOC</span>
-      <button type="button" class="tb-btn" id="infoClose" aria-label="Close">&times;</button>
+      <button type="button" class="tb-btn" id="infoClose" data-i18n-aria="close" aria-label="Close">&times;</button>
     </header>
     <div id="infoBody"></div>
   </article>
@@ -118,23 +118,24 @@
 
 <div id="doneBack" hidden>
   <div class="win" id="doneWin" role="dialog" aria-labelledby="doneTitle">
-    <header class="titlebar"><span>RESULTS.TXT</span></header>
+    <header class="titlebar"><span data-i18n="resultsFile">RESULTS.TXT</span></header>
     <div class="win-body">
       <h2 id="doneTitle">8/8 completed</h2>
       <p class="lead" id="doneScore"></p>
       <div class="field results" id="doneList"></div>
     </div>
     <footer class="win-foot">
-      <div class="btns one"><button type="button" class="btn default" id="restart">Start again</button></div>
+      <div class="btns one"><button type="button" class="btn default" id="restart" data-i18n="restart">Start again</button></div>
     </footer>
   </div>
 </div>
 
 <footer id="statusbar">
-  <span id="statusMsg">Loading&hellip;</span>
+  <button type="button" id="langBtn" lang="ar">العربية</button>
+  <span id="statusMsg">&hellip;</span>
   <!-- CC-BY models must be credited. -->
-  <span class="credit">Model: <a href="https://sketchfab.com/3d-models/mercedes-benz-s-580-maybach-w223-6125a32ee10048ca96eee0c28b9c8b6c">&ldquo;Mercedes-Benz S 580 Maybach (W223)&rdquo;</a> by <a href="https://sketchfab.com/Car2022">GT Cars: Hyperspeed</a>, <a href="https://creativecommons.org/licenses/by/4.0/">CC&nbsp;BY&nbsp;4.0</a></span>
-  <span id="author">Built by Abdullah&nbsp;T</span>
+  <span class="credit"><span data-i18n="modelLabel">Model:</span> <a href="https://sketchfab.com/3d-models/mercedes-benz-s-580-maybach-w223-6125a32ee10048ca96eee0c28b9c8b6c">&ldquo;Mercedes-Benz S 580 Maybach (W223)&rdquo;</a> by <a href="https://sketchfab.com/Car2022">GT Cars: Hyperspeed</a>, <a href="https://creativecommons.org/licenses/by/4.0/">CC&nbsp;BY&nbsp;4.0</a></span>
+  <span id="author"><span data-i18n="builtBy">Built by</span>&nbsp;<span dir="ltr">Abdullah&nbsp;T</span></span>
 </footer>
 
 <script type="module" src="assets/js/sensors.js"></script>
