@@ -361,27 +361,37 @@ export function sensorText(i) { return SENSOR_TEXT[lang][i]; }
 
 export function onLangChange(fn) { listeners.push(fn); }
 
-export function setLang(next, remember = true) {
+export function setLang(next) {
   if (next !== "en" && next !== "ar") return;
   lang = next;
   const html = document.documentElement;
   html.lang = next;
   html.dir = DIR[next];
   document.title = UI[next].title;
-  if (remember) { try { localStorage.setItem(KEY, next); } catch (e) { /* private mode */ } }
+  linkLang();
   listeners.forEach(fn => fn(next));
 }
 
-/* English is the default for everyone, every time, whatever the browser is
-   set to: this is coursework in English and it has to open in English. Arabic
-   is only ever reached by asking for it — ?lang=ar, or the toggle, which is
-   then remembered on that device. */
+/* Arabic carries across the site's own links while you are in it, so the two
+   pages do not throw you back into English mid-visit. */
+function linkLang() {
+  document.querySelectorAll('a[href$=".html"], a[href="./"]').forEach(a => {
+    const u = new URL(a.getAttribute("href"), location.href);
+    if (lang === "ar") u.searchParams.set("lang", "ar");
+    else u.searchParams.delete("lang");
+    a.setAttribute("href", u.pathname.split("/").pop() + u.search);
+  });
+}
+
+/* The site always opens in English, for everybody, every time. Nothing is
+   remembered between loads: this is English coursework, and the examiner,
+   the teacher and a stranger all have to land on English. Arabic exists for
+   whoever is sent ?lang=ar, and for whoever presses the toggle while reading
+   — but a reload is a clean slate. */
 export function initLang() {
+  try { localStorage.removeItem(KEY); } catch (e) { /* private mode */ }
   const q = new URLSearchParams(location.search).get("lang");
-  let want = null, remember = false;
-  if (q === "en" || q === "ar") { want = q; remember = true; }
-  if (!want) { try { want = localStorage.getItem(KEY); } catch (e) { want = null; } }
-  setLang(want === "ar" ? "ar" : "en", remember);
+  setLang(q === "ar" ? "ar" : "en");
 }
 
 /* ------------------------------------------------------------ static DOM */
