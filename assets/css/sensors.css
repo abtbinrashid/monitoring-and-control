@@ -171,13 +171,14 @@ button{ font:inherit; }
   position:fixed; left:0; right:0; bottom:0; z-index:30; display:flex; gap:4px; padding:4px;
   background:var(--face); border-top:1px solid var(--shadow); box-shadow:inset 0 1px 0 var(--hi);
 }
+/* Deliberately quiet: this is an English page with an Arabic copy for one
+   reader, so the toggle is a single letter that only comes forward on hover. */
 #langBtn{
-  flex:none; padding:5px 12px; border:1px solid var(--edge); border-radius:3px;
-  background:linear-gradient(180deg,#e6e7ea,#d0d2d6); box-shadow:var(--raised);
-  font:600 13px/1.3 var(--sans); color:var(--ink); cursor:pointer;
+  flex:none; width:26px; padding:5px 0; border:1px solid transparent; border-radius:2px;
+  background:none; box-shadow:none; cursor:pointer;
+  font:600 12px/1.3 var(--sans); color:#9a9da3; opacity:.65; transition:opacity .15s, color .15s;
 }
-#langBtn:hover{ background:linear-gradient(180deg,#eeeff1,#d8dade); }
-#langBtn:active{ background:#c4c6cb; box-shadow:var(--pressed); }
+#langBtn:hover, #langBtn:focus-visible{ opacity:1; color:var(--signal); border-color:var(--shadow); }
 
 #statusbar > span{ padding:5px 10px; border:1px solid var(--shadow); border-radius:2px; box-shadow:inset 1px 1px 0 #b9bcc1; font:13px/1.3 var(--mono); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 #statusMsg{ flex:none; font-variant-numeric:tabular-nums; }

@@ -16,8 +16,8 @@ export const UI = {
   en: {
     title:        "Monitor or control? — S 580 sensors",
     htmlLang:     "en",
-    switchTo:     "العربية",
-    switchLabel:  "التبديل إلى العربية",
+    switchTo:     "ع",
+    switchLabel:  "العربية — switch to Arabic",
 
     loading:      "Loading model",
     preparing:    "Preparing model",
@@ -89,7 +89,7 @@ export const UI = {
   ar: {
     title:        "مراقبة أم تحكّم؟ — حسّاسات S 580",
     htmlLang:     "ar",
-    switchTo:     "English",
+    switchTo:     "EN",
     switchLabel:  "Switch to English",
 
     loading:      "جارٍ تحميل النموذج",
@@ -370,14 +370,15 @@ export function setLang(next, remember = true) {
   listeners.forEach(fn => fn(next));
 }
 
-/* ?lang=ar wins, then what was chosen last time, then the browser's own
-   preference — an Arabic browser should not have to find the button. */
+/* English is the default for everyone, every time, whatever the browser is
+   set to: this is coursework in English and it has to open in English. Arabic
+   is only ever reached by asking for it — ?lang=ar, or the toggle, which is
+   then remembered on that device. */
 export function initLang() {
   const q = new URLSearchParams(location.search).get("lang");
   let want = null, remember = false;
   if (q === "en" || q === "ar") { want = q; remember = true; }
   if (!want) { try { want = localStorage.getItem(KEY); } catch (e) { want = null; } }
-  if (!want && (navigator.language || "").toLowerCase().startsWith("ar")) want = "ar";
   setLang(want === "ar" ? "ar" : "en", remember);
 }
 
