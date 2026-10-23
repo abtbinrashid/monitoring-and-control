@@ -6,8 +6,8 @@
    eight sensors. None of it is locked — the guide only ever points at the
    step you are on, and ticks it off once you have done it.
 
-   The "drag me" hint is not a step cue: the canvas gives no sign that it can
-   be spun, so a finger swipes over the car until the first touch of it.
+   The "drag me" hint is not a step: the canvas gives no sign that it can be
+   spun, so a finger swipes over the car until the first touch of it.
    ========================================================================== */
 
 import { t, onLangChange } from "./lang.js";
@@ -16,7 +16,7 @@ const $ = id => document.getElementById(id);
 
 const NEEDED = ["control", "monitor"];      /* the two panels step 1 asks for */
 
-const NOW = { read: "nowRead", drag: "nowDrag", quiz: "nowQuiz" };
+const NOW = { read: "nowRead", quiz: "nowQuiz" };
 
 export function initGuide({ viewer, canvas, total }) {
   const stepsEl = $("steps");
@@ -26,12 +26,10 @@ export function initGuide({ viewer, canvas, total }) {
   const topicBtns = [...document.querySelectorAll("[data-topic]")];
   const hint = $("dragHint");
   const read = new Set();
-  let dragged = false, done = 0;
+  let done = 0;
 
   const isDone = key =>
-    key === "read" ? NEEDED.every(t => read.has(t)) :
-    key === "drag" ? dragged :
-                     done >= total;
+    key === "read" ? NEEDED.every(t => read.has(t)) : done >= total;
 
   function render() {
     const L = t();
@@ -66,30 +64,15 @@ export function initGuide({ viewer, canvas, total }) {
     if (viewer && viewer.ready) viewer.ready.then(show, show); else show();
   }
 
-  /* Touching the car is the whole point of the hint, so the first touch of it
-     retires the hint for good, whether or not it turns into a drag. */
+  /* The first touch of the car is the hint's whole job done, so it retires
+     then, whether or not that touch turns into a drag. */
   function dismissHint() {
     if (!hint || hint.hidden || hint.classList.contains("gone")) return;
     hint.classList.add("gone");
     setTimeout(() => { hint.hidden = true; }, 400);
   }
 
-  /* A drag is a press that travels. A click on a hotspot and a wheel zoom
-     both leave the camera where it was, so neither counts for step 2. */
-  const view = canvas || $("view");
-  let from = null;
-  view.addEventListener("pointerdown", e => {
-    from = { x: e.clientX, y: e.clientY };
-    dismissHint();
-  });
-  addEventListener("pointerup",     () => { from = null; });
-  addEventListener("pointercancel", () => { from = null; });
-  addEventListener("pointermove", e => {
-    if (!from || dragged) return;
-    if (Math.hypot(e.clientX - from.x, e.clientY - from.y) < 28) return;
-    dragged = true; from = null;
-    render();
-  });
+  (canvas || $("view")).addEventListener("pointerdown", dismissHint);
 
   /* Put the hint on the car. Its own size is measured once rather than every
      frame, because this runs inside the render loop, and it is kept clear of

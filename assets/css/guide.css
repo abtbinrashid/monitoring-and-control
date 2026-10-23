@@ -131,7 +131,6 @@
   .step{ display:flex; align-items:center; gap:6px; padding:5px 9px 5px 6px; font-size:12.5px; }
   .step::after{ font:600 12.5px/1 var(--mono); }
   .step[data-step="read"]::after{ content:"READ"; }
-  .step[data-step="drag"]::after{ content:"DRAG"; }
   .step[data-step="quiz"]::after{ content:"QUIZ"; }
   .step.done::after{ text-decoration:line-through; text-decoration-color:var(--shadow); }
   .s-t{ position:absolute; width:1px; height:1px; overflow:hidden; clip-path:inset(50%); white-space:nowrap; }
@@ -148,7 +147,6 @@
 [lang="ar"] .s-n{ direction:ltr; }
 @media (max-width: 760px){
   [lang="ar"] .step[data-step="read"]::after{ content:"اقرأ"; }
-  [lang="ar"] .step[data-step="drag"]::after{ content:"اسحب"; }
   [lang="ar"] .step[data-step="quiz"]::after{ content:"الاختبار"; }
   [lang="ar"] .step::after{ font-family:var(--sans); font-size:12px; }
 }
